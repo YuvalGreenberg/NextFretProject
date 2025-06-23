@@ -1,11 +1,20 @@
-// /src/screens/LoginScreen.js
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+// src/screens/LoginScreen.js
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Alert,
+  StyleSheet
+} from 'react-native';
 import API_URL from '../config';
+import { AuthContext } from '../../App';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
+  const { signIn } = useContext(AuthContext);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,13 +38,8 @@ export default function LoginScreen({ navigation }) {
 
       if (response.status === 200) {
         const user = JSON.parse(responseText);
-        // נווט ל־Main ונאפס את הסטאק, כדי שלא ניתן לחזור למסך Login
-        navigation.reset({
-          index: 0,
-          routes: [
-            { name: 'Main', params: { userId: user.id } }
-          ],
-        });
+        // שמירת userId ו-token ב-SecureStore דרך Context
+        await signIn({ id: String(user.id), token: String(user.token) });
       } else {
         Alert.alert('Login Failed', responseText || 'Unknown error');
       }

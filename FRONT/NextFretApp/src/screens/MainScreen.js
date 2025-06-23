@@ -1,5 +1,5 @@
-// /src/screens/MainScreen.js
-import React, { useState } from 'react';
+// src/screens/MainScreen.js
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -11,12 +11,14 @@ import {
 } from 'react-native';
 import API_URL from '../config';
 import { useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback } from 'react';
 import FooterMenu from '../components/FooterMenu';
+import { AuthContext } from '../../App';
 
-
-export default function MainScreen({ navigation, route }) {
-  const { userId } = route.params;
+export default function MainScreen({ navigation }) {
+  // משיכת userId מה-Context במקום route.params
+  const { userId } = useContext(AuthContext);
 
   const [myChords, setMyChords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,28 +31,24 @@ export default function MainScreen({ navigation, route }) {
       setLoadingChords(true);
       fetch(`${API_URL}/api/userManager/${userId}/chords`)
         .then(res => res.json())
-        .then(data => {
-          setMyChords(data);
-        })
+        .then(data => setMyChords(data))
         .catch(err => console.error(err))
         .finally(() => setLoadingChords(false));
     }, [userId])
   );
 
-  React.useEffect(() => {
-    // 2. טען את כל ההמלצות (נציג רק 5 ראשונים)
+  useEffect(() => {
+    setLoadingRecs(true);
     fetch(`${API_URL}/api/recommendationEngine/user/${userId}`)
       .then(res => res.json())
-      .then(data => {
-        setRecommended(data.slice(0, 5)); // קח רק 5 ראשונים
-      })
+      .then(data => setRecommended(data.slice(0, 5)))
       .catch(err => console.error(err))
       .finally(() => setLoadingRecs(false));
   }, [userId]);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
-    navigation.navigate('SearchResultsScreen', { query: searchTerm });
+    navigation.navigate('SearchResults');
   };
 
   const renderChordItem = ({ item }) => (
@@ -62,76 +60,78 @@ export default function MainScreen({ navigation, route }) {
   const renderSongItem = ({ item }) => (
     <TouchableOpacity
       style={styles.songItem}
-      onPress={() => navigation.navigate('SongDetailScreen', { song: item })}
+      onPress={() => navigation.navigate('SongDetail', { song: item })}
     >
       <Text style={styles.songTitle}>{item.title}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        {/* חלק עליון: כותרת ואקורדים */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Chords</Text>
-          {loadingChords ? (
-            <ActivityIndicator size="small" />
-          ) : (
-            <FlatList
-              horizontal
-              data={myChords}
-              keyExtractor={item => item.id.toString()}
-              renderItem={renderChordItem}
-              ListEmptyComponent={<Text style={styles.emptyText}>No chords yet</Text>}
-            />
-          )}
-          <TouchableOpacity
-            style={styles.arrowButton}
-            onPress={() => navigation.navigate('MyChords', { userId })}
-          >
-            <Text style={styles.arrowText}>›››</Text>
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          {/* חלק עליון: כותרת ואקורדים */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Your Chords</Text>
+            {loadingChords ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <FlatList
+                horizontal
+                data={myChords}
+                keyExtractor={item => item.id.toString()}
+                renderItem={renderChordItem}
+                ListEmptyComponent={<Text style={styles.emptyText}>No chords yet</Text>}
+              />
+            )}
+            <TouchableOpacity
+              style={styles.arrowButton}
+              onPress={() => navigation.navigate('MyChords')}
+            >
+              <Text style={styles.arrowText}>›››</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* חיפוש שירים */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Search Song by Name</Text>
-          <View style={styles.searchRow}>
-            <TextInput
-              placeholder="Type song name..."
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-              style={styles.searchInput}
-            />
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-              <Text style={styles.searchButtonText}>Search</Text>
+          {/* חיפוש שירים */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Search Song by Name</Text>
+            <View style={styles.searchRow}>
+              <TextInput
+                placeholder="Type song name..."
+                value={searchTerm}
+                onChangeText={setSearchTerm}
+                style={styles.searchInput}
+              />
+              <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                <Text style={styles.searchButtonText}>Search</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* המלצות */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Recommended Songs</Text>
+            {loadingRecs ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <FlatList
+                data={recommended}
+                keyExtractor={item => item.id.toString()}
+                renderItem={renderSongItem}
+                ListEmptyComponent={<Text style={styles.emptyText}>No recommendations</Text>}
+              />
+            )}
+            <TouchableOpacity
+              style={styles.arrowButton}
+              onPress={() => navigation.navigate('RecommendationsFull')}
+            >
+              <Text style={styles.arrowText}>›››</Text>
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* המלצות */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recommended Songs</Text>
-          {loadingRecs ? (
-            <ActivityIndicator size="small" />
-          ) : (
-            <FlatList
-              data={recommended}
-              keyExtractor={item => item.id.toString()}
-              renderItem={renderSongItem}
-              ListEmptyComponent={<Text style={styles.emptyText}>No recommendations</Text>}
-            />
-          )}
-          <TouchableOpacity
-            style={styles.arrowButton}
-            onPress={() => navigation.navigate('RecommendationsFull', { userId })}
-          >
-            <Text style={styles.arrowText}>›››</Text>
-          </TouchableOpacity>
-        </View>
+        <FooterMenu navigation={navigation} />
       </View>
-      <FooterMenu navigation={navigation} />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   section: { marginBottom: 24 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+  safeArea: { flex: 1, backgroundColor: '#fff' },
 
   chordItem: {
     backgroundColor: '#F2E8CF',
@@ -155,7 +156,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     padding: 8,
-    
   },
   arrowText: { fontSize: 24, color: '#386641' },
 

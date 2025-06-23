@@ -1,35 +1,58 @@
-/*
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-*/
-
 // App.js
-import React from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
 import AppNavigator from './src/navigation/AppNavigator';
 
+// 1. יוצרים את ה־Context
+export const AuthContext = createContext();
+
 export default function App() {
+  const [userId, setUserId] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 2. בטעינה ראשונית: קרא מה־SecureStore
+  useEffect(() => {
+    (async () => {
+      const storedId = await SecureStore.getItemAsync('userId');
+      const storedToken = await SecureStore.getItemAsync('authToken');
+      if (storedId && storedToken) {
+        setUserId(storedId);
+        setAuthToken(storedToken);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  // 3. פונקציות להתחברות/התנתקות
+  const authContextValue = {
+    userId,
+    authToken,
+    signIn: async ({ id, token }) => {
+      setUserId(id);
+      setAuthToken(token);
+      await SecureStore.setItemAsync('userId', id);
+      await SecureStore.setItemAsync('authToken', token);
+    },
+    signOut: async () => {
+      setUserId(null);
+      setAuthToken(null);
+      await SecureStore.deleteItemAsync('userId');
+      await SecureStore.deleteItemAsync('authToken');
+    }
+  };
+
+  if (loading) {
+    // אפשר להחזיר פה SplashScreen אם יש
+    return null;
+  }
+
   return (
-    <NavigationContainer>
-      <AppNavigator />
-    </NavigationContainer>
+    <AuthContext.Provider value={authContextValue}>
+      <NavigationContainer>
+        <AppNavigator isLoggedIn={!!userId} />
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }

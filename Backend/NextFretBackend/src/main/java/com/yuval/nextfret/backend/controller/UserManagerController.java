@@ -1,5 +1,6 @@
 package com.yuval.nextfret.backend.controller;
 
+import com.yuval.nextfret.backend.entity.Song;
 import com.yuval.nextfret.backend.entity.User;
 import com.yuval.nextfret.backend.service.UserService;
 import com.yuval.nextfret.backend.db.Db;
@@ -130,4 +131,51 @@ public class UserManagerController {
         db.deleteUserChord(userId, chordId);
         return ResponseEntity.ok().build();
     }
+
+    // מחזיר את ספריית השירים של המשתמש
+    @GetMapping("/{userId}/library")
+    public ResponseEntity<List<Song>> getUserLibrary(@PathVariable Long userId) {
+        List<Song> library = userService.getLibraryByUserId(userId);
+        return ResponseEntity.ok(library);
+    }
+
+    // מחזיר את פרטי השיר המלאים למשתמש על פי ID
+    @GetMapping("/{userId}/fullSong/{songId}")
+    public ResponseEntity<?> getUserFullSong(
+            @PathVariable Long userId,
+            @PathVariable Long songId) {
+        try {
+            Song song = userService.getFullSongByUserId(userId, songId);
+            if (song == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(song);
+        } catch (Exception e) {
+            // Log the full stack trace
+            e.printStackTrace();
+            // Return a JSON body showing the error message
+            Map<String, String> err = new HashMap<>();
+            err.put("error", e.getMessage());
+            return ResponseEntity.status(500).body(err);
+        }
+    }
+
+    // מוסיף שיר לספריית המשתמש (לייק)
+    @PostMapping("/{userId}/songs/{songId}")
+    public ResponseEntity<?> addUserSong(
+            @PathVariable Long userId,
+            @PathVariable Long songId) {
+        db.addUserSong(userId, songId);
+        return ResponseEntity.ok().build();
+    }
+
+    // מסיר שיר מהספרייה (אנלייק)
+    @DeleteMapping("/{userId}/songs/{songId}")
+    public ResponseEntity<?> deleteUserSong(
+            @PathVariable Long userId,
+            @PathVariable Long songId) {
+        db.deleteUserSong(userId, songId);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -1,25 +1,23 @@
-// /src/navigation/AppNavigator.js
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+// src/navigation/AppNavigator.js
+import React, { useContext } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AuthContext } from '../../App';
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+
 import MainScreen from '../screens/MainScreen';
+import MyLibraryScreen from '../screens/MyLibraryScreen';
 import MyChordsScreen from '../screens/MyChordsScreen';
 import RecommendationsScreen from '../screens/RecommendationsScreen';
-// מי שרוצה יכול להוסיף מסך חיפוש שירים, אם רוצים תפריט נפרד:
 import SearchResultsScreen from '../screens/SearchResultsScreen';
+import SongDetailScreen from '../screens/SongDetailScreen';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
-export default function AppNavigator() {
+function AuthStack() {
   return (
-    <Stack.Navigator
-      initialRouteName="Login"
-      screenOptions={{
-        headerTitleAlign: 'center',
-      }}
-    >
+    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center' }}>
       <Stack.Screen
         name="Login"
         component={LoginScreen}
@@ -30,10 +28,26 @@ export default function AppNavigator() {
         component={RegisterScreen}
         options={{ title: 'Register' }}
       />
+    </Stack.Navigator>
+  );
+}
+
+function AppStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center' }}>
       <Stack.Screen
         name="Main"
         component={MainScreen}
-        options={{ title: 'NextFret Home' }}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MyLibrary"
+        component={MyLibraryScreen}
+        options={{
+                   title: 'My Library',                  
+                   headerBackVisible: false,                      
+                   
+                 }}
       />
       <Stack.Screen
         name="MyChords"
@@ -46,10 +60,20 @@ export default function AppNavigator() {
         options={{ title: 'All Recommendations' }}
       />
       <Stack.Screen
-        name="SearchResultScreen"
+        name="SearchResults"
         component={SearchResultsScreen}
         options={{ title: 'Search Songs' }}
       />
+      <Stack.Screen
+        name="SongDetail"
+        component={SongDetailScreen}
+        options={{ title: 'Song Detail' }}
+      />
     </Stack.Navigator>
   );
+}
+
+export default function AppNavigator() {
+  const { userId } = useContext(AuthContext);
+  return userId == null ? <AuthStack /> : <AppStack />;
 }

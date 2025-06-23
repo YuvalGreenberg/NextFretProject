@@ -14,6 +14,13 @@ export default function FooterMenu({ navigation }) {
 
       <TouchableOpacity 
         style={styles.button} 
+        onPress={() => navigation.navigate('MyLibrary')}
+      >
+        <Text style={styles.text}>My Library</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.button} 
         onPress={() => navigation.navigate('RecommendationsFull')}
       >
         <Text style={styles.text}>Recommend</Text>

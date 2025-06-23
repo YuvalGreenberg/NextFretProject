@@ -1,6 +1,6 @@
 // NextFretApp/src/screens/MyChordsScreen.js
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,10 @@ import {
   TextInput,
 } from 'react-native';
 import API_URL from '../config';
+import { AuthContext } from '../../App';
 
 export default function MyChordsScreen({ navigation, route }) {
-  const { userId } = route.params; // userId חייב להיות מספר
+  const { userId } = useContext(AuthContext); 
 
   const [chords, setChords] = useState([]);           // רשימת כל האקורדים (עם שדה known)
   const [loading, setLoading] = useState(true);
