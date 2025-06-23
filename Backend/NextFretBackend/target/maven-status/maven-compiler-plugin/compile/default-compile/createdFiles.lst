@@ -1,0 +1,13 @@
+com/yuval/nextfret/backend/service/UserService.class
+com/yuval/nextfret/backend/db/Db.class
+com/yuval/nextfret/backend/controller/UserManagerController.class
+com/yuval/nextfret/backend/config/WebConfig.class
+com/yuval/nextfret/backend/BackendApplication.class
+com/yuval/nextfret/backend/repository/SongRepository.class
+com/yuval/nextfret/backend/controller/RecommendationEngineController.class
+com/yuval/nextfret/backend/entity/Song.class
+com/yuval/nextfret/backend/repository/UserRepository.class
+com/yuval/nextfret/backend/repository/ChordRepository.class
+com/yuval/nextfret/backend/entity/Chord.class
+com/yuval/nextfret/backend/service/RecommendationService.class
+com/yuval/nextfret/backend/entity/User.class

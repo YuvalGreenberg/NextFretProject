@@ -1,0 +1,13 @@
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/BackendApplication.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/config/WebConfig.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/controller/RecommendationEngineController.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/controller/UserManagerController.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/db/Db.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/entity/Chord.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/entity/Song.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/entity/User.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/repository/ChordRepository.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/repository/SongRepository.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/repository/UserRepository.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/service/RecommendationService.java
+/Users/yuvalgreenberg/Desktop/NextFretPROJECT/Backend/NextFretBackend/src/main/java/com/yuval/nextfret/backend/service/UserService.java
