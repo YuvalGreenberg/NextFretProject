@@ -18,7 +18,9 @@ public class RecommendationService {
     }
 
     public List<Song> recommendSongsForUser(Long userId) {
-        // אפשר להוסיף בדיקה: אם המשתמש לא קיים, לזרוק Exception או להחזיר רשימה ריקה.
+        
         return db.getRecommendationsForUser(userId);
     }
+
+    
 }

@@ -13,6 +13,7 @@ export default function SongDetailScreen({ route }) {
   const [song, setSong] = useState(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(!!smallSong?.isLiked);
+  const [userChords, setUserChords] = useState([]);
 
   // משיכה של הפרטים המלאים מהשרת
   useEffect(() => {
@@ -26,6 +27,16 @@ export default function SongDetailScreen({ route }) {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [songId, userId]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/userManager/${userId}/chords`)
+      .then(res => res.json())
+      .then(data => {
+        const ids = Array.isArray(data) ? data.map(chord => chord.id) : [];
+        setUserChords(ids);
+      })
+      .catch(console.error);
+  }, [userId]);
 
   // מצב טעינה
   if (loading) {
@@ -49,11 +60,11 @@ export default function SongDetailScreen({ route }) {
   const toggleLike = () => {
     const newLiked = !liked;
     setLiked(newLiked);
-    fetch(`${API_URL}/api/userManager/${userId}/fullSong/${songId}`, {
-      method: newLiked ? 'POST' : 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ songId })
-    }).catch(console.error);
+    const likeUrl = `${API_URL}/api/userManager/${userId}/${newLiked ? 'likes' : 'dislikes'}/${songId}`;
+    fetch(likeUrl, {
+      method: newLiked ? 'POST' : 'DELETE'
+    })
+    .catch(console.error);
   };
 
   return (
@@ -67,24 +78,28 @@ export default function SongDetailScreen({ route }) {
       </TouchableOpacity>
 
       <Text style={styles.title}>{song.title}</Text>
-      <Text style={styles.artist}>{song.artistName || 'Unknown Artist'}</Text>
+      <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
 
       <Text style={styles.sectionHeader}>Chords:</Text>
       <View style={styles.chordList}>
         {song.chordList?.length > 0 ? (
-          song.chordList.map(c => (
-            <Text
-              key={c.id}
-              style={[
-                styles.chordText,
-                { color: c.known ? 'green' : 'grey' }
-              ]}
-            >
-              {c.name}
-            </Text>
-          ))
+          song.chordList.map(c => {
+            const known = userChords.includes(c.id);
+            return (
+              <TouchableOpacity
+                key={c.id}
+                style={[
+                  styles.chordButton,
+                  known ? styles.chordButtonKnown : styles.chordButtonUnknown
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.chordButtonText}>{c.name}</Text>
+              </TouchableOpacity>
+            );
+          })
         ) : (
-          <Text style={styles.chordText}>No chords available.</Text>
+          <Text style={styles.chordButtonText}>No chords available.</Text>
         )}
       </View>
 
@@ -134,10 +149,22 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 16,
   },
-  chordText: {
+  chordButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
     marginRight: 8,
-    fontSize: 16,
-    marginBottom: 4,
+    marginBottom: 8,
+  },
+  chordButtonKnown: {
+    backgroundColor: 'lightgreen',
+  },
+  chordButtonUnknown: {
+    backgroundColor: '#ddd',
+  },
+  chordButtonText: {
+    fontSize: 14,
+    color: '#000',
   },
   lyrics: {
     marginTop: 8,

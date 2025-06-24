@@ -55,7 +55,7 @@ function AppStack() {
         options={{ title: 'My Chords' }}
       />
       <Stack.Screen
-        name="RecommendationsFull"
+        name="RecommendationScreen"
         component={RecommendationsScreen}
         options={{ title: 'All Recommendations' }}
       />

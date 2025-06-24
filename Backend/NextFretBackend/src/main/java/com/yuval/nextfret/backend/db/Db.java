@@ -213,27 +213,58 @@ public class Db {
 
     public List<Song> getRecommendationsForUser(Long userId) {
         List<Song> songs = new ArrayList<>();
-        // דוגמה לשאילתא בסיסית – מחזירה את כל השירים. אם תרצה להגביל לפי אקורדים/עדפות
-        // למשתמש,
-        // החלף בשאילתא מתאימה למבנה הטבלאות שלך.
-        String sql = "SELECT s.id, s.title, s.lyrics FROM songs s";
-
+        String sql =
+            "WITH user_known AS (" +
+            "  SELECT chord_id FROM user_chords WHERE user_id = ?" +
+            ") " +
+            "SELECT s.id, s.title, s.lyrics, a.name AS artist_name " +
+            "FROM songs s " +
+            "JOIN song_chords sc ON s.id = sc.song_id " +
+            "JOIN chords c ON sc.chord_id = c.id " +
+            "LEFT JOIN artists a ON s.artist_id = a.id " +
+            "WHERE s.id NOT IN (" +
+            "  SELECT song_id FROM user_songs WHERE user_id = ?" +
+            ") " +
+            "GROUP BY s.id, s.title, s.lyrics, a.name " +
+            "HAVING SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN c.difficulty ELSE 0 END) <= 5 " +
+            "ORDER BY SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN c.difficulty ELSE 0 END) ASC, random() " +
+            "LIMIT 20";
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Song s = new Song();
-                s.setId(rs.getLong("id"));
-                s.setTitle(rs.getString("title"));
-                s.setLyrics(rs.getString("lyrics"));
-                songs.add(s);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            stmt.setLong(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Song s = new Song();
+                    s.setId(rs.getLong("id"));
+                    s.setTitle(rs.getString("title"));
+                    s.setLyrics(rs.getString("lyrics"));
+                    s.setArtistName(rs.getString("artist_name"));
+                    // Populate full chord list for the song
+                    String chordSql =
+                        "SELECT c.id, c.name FROM chords c " +
+                        "JOIN song_chords sc2 ON c.id = sc2.chord_id " +
+                        "WHERE sc2.song_id = ?";
+                    try (PreparedStatement chordStmt = conn.prepareStatement(chordSql)) {
+                        chordStmt.setLong(1, s.getId());
+                        try (ResultSet crs = chordStmt.executeQuery()) {
+                            List<Chord> chordList = new ArrayList<>();
+                            while (crs.next()) {
+                                Chord chord = new Chord();
+                                chord.setId(crs.getLong("id"));
+                                chord.setName(crs.getString("name"));
+                                chordList.add(chord);
+                            }
+                            s.setChordList(chordList);
+                        }
+                    }
+                    songs.add(s);
+                }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Error fetching recommendations: " + e.getMessage(), e);
         }
-
         return songs;
     }
 
@@ -317,8 +348,10 @@ public class Db {
 
     public List<Song> getLibraryByUserId(Long userId) {
         List<Song> songs = new ArrayList<>();
-        String sql = "SELECT s.id, s.title, s.lyrics us.date_added us.rating FROM songs s " +
+        String sql = "SELECT s.id, s.title, s.lyrics, a.name AS artist_name, us.date_added " +
+                "FROM songs s " +
                 "JOIN user_songs us ON s.id = us.song_id " +
+                "LEFT JOIN artists a ON s.artist_id = a.id " +
                 "WHERE us.user_id = ?";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -329,6 +362,7 @@ public class Db {
                     s.setId(rs.getLong("id"));
                     s.setTitle(rs.getString("title"));
                     s.setLyrics(rs.getString("lyrics"));
+                    s.setArtistName(rs.getString("artist_name"));
                     s.setAddedDate(rs.getDate("date_added"));
                     songs.add(s);
                 }
@@ -413,13 +447,29 @@ public Song getFullSongDetailsForUser(Long userId, Long songId) {
 }
 
 public void addUserSong(Long userId, Long songId) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'addUserSong'");
+    String sql = "INSERT INTO user_songs (user_id, song_id, date_added) VALUES (?, ?, NOW())";
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setLong(1, userId);
+        stmt.setLong(2, songId);
+        stmt.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error adding song to user library: " + e.getMessage(), e);
+    }
 }
 
 public void deleteUserSong(Long userId, Long songId) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deleteUserSong'");
+    String sql = "DELETE FROM user_songs WHERE user_id = ? AND song_id = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setLong(1, userId);
+        stmt.setLong(2, songId);
+        stmt.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error deleting song from user library: " + e.getMessage(), e);
+    }
 }
 
 }

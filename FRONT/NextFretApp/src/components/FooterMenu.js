@@ -21,7 +21,7 @@ export default function FooterMenu({ navigation }) {
 
       <TouchableOpacity 
         style={styles.button} 
-        onPress={() => navigation.navigate('RecommendationsFull')}
+        onPress={() => navigation.navigate('RecommendationScreen')}
       >
         <Text style={styles.text}>Recommend</Text>
       </TouchableOpacity>

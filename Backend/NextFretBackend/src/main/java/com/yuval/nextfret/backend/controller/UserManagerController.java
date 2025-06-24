@@ -3,6 +3,7 @@ package com.yuval.nextfret.backend.controller;
 import com.yuval.nextfret.backend.entity.Song;
 import com.yuval.nextfret.backend.entity.User;
 import com.yuval.nextfret.backend.service.UserService;
+import com.yuval.nextfret.backend.service.ItunesCoverService;
 import com.yuval.nextfret.backend.db.Db;
 import com.yuval.nextfret.backend.entity.Chord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,14 @@ public class UserManagerController {
 
     private final UserService userService;
     private final Db db;
+    //private final ItunesCoverService itunesService;
+
 
     @Autowired
     public UserManagerController(UserService userService, Db db) {
         this.userService = userService;
         this.db = db;
+        
     }
 
     @GetMapping("/all")
@@ -161,7 +165,7 @@ public class UserManagerController {
     }
 
     // מוסיף שיר לספריית המשתמש (לייק)
-    @PostMapping("/{userId}/songs/{songId}")
+    @PostMapping("/{userId}/likes/{songId}")
     public ResponseEntity<?> addUserSong(
             @PathVariable Long userId,
             @PathVariable Long songId) {
@@ -170,12 +174,14 @@ public class UserManagerController {
     }
 
     // מסיר שיר מהספרייה (אנלייק)
-    @DeleteMapping("/{userId}/songs/{songId}")
+    @DeleteMapping("/{userId}/dislikes/{songId}")
     public ResponseEntity<?> deleteUserSong(
             @PathVariable Long userId,
             @PathVariable Long songId) {
         db.deleteUserSong(userId, songId);
         return ResponseEntity.ok().build();
     }
+
+    
 
 }
