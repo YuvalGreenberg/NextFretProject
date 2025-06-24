@@ -114,6 +114,17 @@ public class UserManagerController {
         return ResponseEntity.ok(chords);
     }
 
+    // מחזיר פרטי משתמש (פרופיל)
+    @GetMapping("/{userId}/profile")
+    public ResponseEntity<?> getUserProfile(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }        
+        user.setPassword(null);
+        return ResponseEntity.ok(user);
+    }
+
     // מוסיף אקורד למשתמש
     @PostMapping("/{userId}/chords")
     public ResponseEntity<?> addUserChord(

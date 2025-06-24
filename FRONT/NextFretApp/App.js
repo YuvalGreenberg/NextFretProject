@@ -3,15 +3,16 @@ import React, { createContext, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import AppNavigator from './src/navigation/AppNavigator';
+import AuthContext from './src/contexts/AuthContext'; 
 
-// 1. יוצרים את ה־Context
-export const AuthContext = createContext();
 
 export default function App() {
   const [userId, setUserId] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
+  
   // 2. בטעינה ראשונית: קרא מה־SecureStore
   useEffect(() => {
     (async () => {
@@ -51,7 +52,7 @@ export default function App() {
   return (
     <AuthContext.Provider value={authContextValue}>
       <NavigationContainer>
-        <AppNavigator isLoggedIn={!!userId} />
+        <AppNavigator />
       </NavigationContainer>
     </AuthContext.Provider>
   );

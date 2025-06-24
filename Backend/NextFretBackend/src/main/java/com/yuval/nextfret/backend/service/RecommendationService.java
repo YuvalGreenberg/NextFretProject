@@ -22,5 +22,9 @@ public class RecommendationService {
         return db.getRecommendationsForUser(userId);
     }
 
+    public List<Song> searchSongs(String query) {
+        return db.searchSongs(query);
+    }
+
     
 }

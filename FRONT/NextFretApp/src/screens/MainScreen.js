@@ -11,10 +11,8 @@ import {
 } from 'react-native';
 import API_URL from '../config';
 import { useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback } from 'react';
-import FooterMenu from '../components/FooterMenu';
-import { AuthContext } from '../../App';
+import AuthContext from '../contexts/AuthContext';
 
 export default function MainScreen({ navigation }) {
   // משיכת userId מה-Context במקום route.params
@@ -67,71 +65,71 @@ export default function MainScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.content}>
-          {/* חלק עליון: כותרת ואקורדים */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Chords</Text>
-            {loadingChords ? (
-              <ActivityIndicator size="small" />
-            ) : (
-              <FlatList
-                horizontal
-                data={myChords}
-                keyExtractor={item => item.id.toString()}
-                renderItem={renderChordItem}
-                ListEmptyComponent={<Text style={styles.emptyText}>No chords yet</Text>}
-              />
-            )}
-            <TouchableOpacity
-              style={styles.arrowButton}
-              onPress={() => navigation.navigate('MyChords')}
-            >
-              <Text style={styles.arrowText}>›››</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* חיפוש שירים */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Search Song by Name</Text>
-            <View style={styles.searchRow}>
-              <TextInput
-                placeholder="Type song name..."
-                value={searchTerm}
-                onChangeText={setSearchTerm}
-                style={styles.searchInput}
-              />
-              <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                <Text style={styles.searchButtonText}>Search</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        {/* חלק עליון: כותרת ואקורדים */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Your Chords</Text>
+          {loadingChords ? (
+            <ActivityIndicator size="small" />
+          ) : (
+            <FlatList
+              horizontal
+              data={myChords}
+              keyExtractor={item => item.id.toString()}
+              renderItem={renderChordItem}
+              ListEmptyComponent={<Text style={styles.emptyText}>No chords yet</Text>}
+            />
+          )}
+          <TouchableOpacity
+            style={styles.arrowButton}
+            onPress={() => navigation.navigate('MyChords')}
+          >
+            <Text style={styles.arrowText}>›››</Text>
+          </TouchableOpacity>
+        </View>
 
-          {/* המלצות */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Recommended Songs</Text>
-            {loadingRecs ? (
-              <ActivityIndicator size="small" />
-            ) : (
-              <FlatList
-                data={recommended}
-                keyExtractor={item => item.id.toString()}
-                renderItem={renderSongItem}
-                ListEmptyComponent={<Text style={styles.emptyText}>No recommendations</Text>}
-              />
-            )}
-            <TouchableOpacity
-              style={styles.arrowButton}
-              onPress={() => navigation.navigate('RecommendationsFull')}
-            >
-              <Text style={styles.arrowText}>›››</Text>
+        {/* חיפוש שירים */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Search Song by Name</Text>
+          <View style={styles.searchRow}>
+            <TextInput
+              placeholder="Type song name..."
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              style={styles.searchInput}
+            />
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+              <Text style={styles.searchButtonText}>Search</Text>
             </TouchableOpacity>
           </View>
         </View>
-        <FooterMenu navigation={navigation} />
+
+        {/* המלצות */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recommended Songs</Text>
+          {loadingRecs ? (
+            <ActivityIndicator size="small" />
+          ) : (
+            <FlatList
+              data={recommended}
+              keyExtractor={item => item.id.toString()}
+              renderItem={renderSongItem}
+              ListEmptyComponent={<Text style={styles.emptyText}>No recommendations</Text>}
+            />
+          )}
+          <TouchableOpacity
+            style={styles.arrowButton}
+            onPress={() => navigation.navigate('RecommendationsFull')}
+          >
+            <Text style={styles.arrowText}>›››</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </SafeAreaView>
+      {/* {<FooterMenu navigation={navigation} /> } */}
+    </View>
+
   );
 }
 

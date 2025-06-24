@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import API_URL from '../config';
-import { AuthContext } from '../../App';
+import AuthContext from '../contexts/AuthContext';
 
-export default function SongDetailScreen({ route }) {
+export default function SongDetailScreen({ route , navigation }) {
   // smallSong מגיע מהניווט ומכיל רק id (ואולי כותרת)
   const { song: smallSong } = route.params;
   const { userId } = useContext(AuthContext);
@@ -68,44 +68,47 @@ export default function SongDetailScreen({ route }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
-        <Ionicons
-          name={liked ? 'heart' : 'heart-outline'}
-          size={28}
-          color={liked ? 'red' : 'grey'}
-        />
-      </TouchableOpacity>
+    
+      
+        <ScrollView contentContainerStyle={styles.container}>
+          <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
+            <Ionicons
+              name={liked ? 'heart' : 'heart-outline'}
+              size={28}
+              color={liked ? 'red' : 'grey'}
+            />
+          </TouchableOpacity>
 
-      <Text style={styles.title}>{song.title}</Text>
-      <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
+          <Text style={styles.title}>{song.title}</Text>
+          <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
 
-      <Text style={styles.sectionHeader}>Chords:</Text>
-      <View style={styles.chordList}>
-        {song.chordList?.length > 0 ? (
-          song.chordList.map(c => {
-            const known = userChords.includes(c.id);
-            return (
-              <TouchableOpacity
-                key={c.id}
-                style={[
-                  styles.chordButton,
-                  known ? styles.chordButtonKnown : styles.chordButtonUnknown
-                ]}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.chordButtonText}>{c.name}</Text>
-              </TouchableOpacity>
-            );
-          })
-        ) : (
-          <Text style={styles.chordButtonText}>No chords available.</Text>
-        )}
-      </View>
+          <Text style={styles.sectionHeader}>Chords:</Text>
+          <View style={styles.chordList}>
+            {song.chordList?.length > 0 ? (
+              song.chordList.map(c => {
+                const known = userChords.includes(c.id);
+                return (
+                  <TouchableOpacity
+                    key={c.id}
+                    style={[
+                      styles.chordButton,
+                      known ? styles.chordButtonKnown : styles.chordButtonUnknown
+                    ]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.chordButtonText}>{c.name}</Text>
+                  </TouchableOpacity>
+                );
+              })
+            ) : (
+              <Text style={styles.chordButtonText}>No chords available.</Text>
+            )}
+          </View>
 
-      <Text style={styles.sectionHeader}>Lyrics:</Text>
-      <Text style={styles.lyrics}>{song.lyrics || 'No lyrics available.'}</Text>
-    </ScrollView>
+          <Text style={styles.sectionHeader}>Lyrics:</Text>
+          <Text style={styles.lyrics}>{song.lyrics || 'No lyrics available.'}</Text>
+        </ScrollView>
+     
   );
 }
 
@@ -118,7 +121,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
-    paddingTop: 48,
     backgroundColor: '#fff',
   },
   likeButton: {
@@ -170,5 +172,18 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 16,
     lineHeight: 22,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    maxHeight: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
   },
 });

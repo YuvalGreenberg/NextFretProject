@@ -12,10 +12,10 @@ import {
   TextInput,
 } from 'react-native';
 import API_URL from '../config';
-import { AuthContext } from '../../App';
+import AuthContext from '../contexts/AuthContext';
 
 export default function MyChordsScreen({ navigation, route }) {
-  const { userId } = useContext(AuthContext); 
+  const { userId } = useContext(AuthContext);
 
   const [chords, setChords] = useState([]);           // רשימת כל האקורדים (עם שדה known)
   const [loading, setLoading] = useState(true);

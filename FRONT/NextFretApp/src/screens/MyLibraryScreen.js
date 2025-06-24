@@ -10,10 +10,8 @@ import {
   ActivityIndicator,
   StyleSheet
 } from 'react-native';  
-import FooterMenu from '../components/FooterMenu';
 import API_URL from '../config';
-import { AuthContext } from '../../App';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import AuthContext from '../contexts/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function MyLibraryScreen({ navigation }) {
@@ -92,7 +90,7 @@ export default function MyLibraryScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    
       <View style={styles.container}>       
         <TextInput
           style={styles.search}
@@ -115,9 +113,9 @@ export default function MyLibraryScreen({ navigation }) {
             </View>
         )}
 
-        <FooterMenu navigation={navigation} />
+        {/* <FooterMenu navigation={navigation} /> */}
       </View>
-    </SafeAreaView>
+    
   );
 }
 

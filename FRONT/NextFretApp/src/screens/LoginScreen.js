@@ -9,7 +9,7 @@ import {
   StyleSheet
 } from 'react-native';
 import API_URL from '../config';
-import { AuthContext } from '../../App';
+import AuthContext from '../contexts/AuthContext';
 
 export default function LoginScreen() {
   const [email, setEmail]       = useState('');

@@ -4,10 +4,9 @@ import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Image } fr
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import API_URL from '../config';
-import { AuthContext } from '../../App';
+import AuthContext from '../contexts/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Footer from '../components/FooterMenu';
+
 
 export default function RecommendationsScreen({ navigation }) {
   const { userId } = useContext(AuthContext);
@@ -44,7 +43,7 @@ export default function RecommendationsScreen({ navigation }) {
   }, [userId]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    
       <View style={styles.container}>
         {loading ? (
           <ActivityIndicator size="small" />
@@ -100,8 +99,8 @@ export default function RecommendationsScreen({ navigation }) {
                 {/* Action buttons */}
                 <View style={styles.actionButtons}>
                   <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => navigation.navigate('SongDetailScreen', { song: songs[currentIndex] })}
+                    style={styles.actionButton}                     
+                    onPress={() => navigation.navigate('SongDetail', { song: songs[currentIndex] })}
                   >
                     <Ionicons name="information-circle-outline" size={24} />
                   </TouchableOpacity>
@@ -116,9 +115,7 @@ export default function RecommendationsScreen({ navigation }) {
           <Text style={styles.emptyText}>No more recommendations.</Text>
         )}
       </View>
-      {/* Footer */}
-      <Footer navigation={navigation} />
-    </SafeAreaView>
+      
   );
 }
 
