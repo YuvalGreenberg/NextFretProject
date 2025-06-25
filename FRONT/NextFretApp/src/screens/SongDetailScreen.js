@@ -158,15 +158,28 @@ export default function SongDetailScreen({ route, navigation }) {
         </View>
 
         
-        <Text style={styles.lyrics}>
-          {(song.lyrics || 'No lyrics available.')
-            .split('\n')
-            .filter(line => !line.trim().startsWith('#')) // remove lines starting with #
-            .map(line => line.replace(/\{[^}]+\}/g, '')) // remove {...} comments
-            .join('\n')
-            .replace(/\n{3,}/g, '\n\n') // collapse 3+ newlines to just 2
-            .trim()}
-        </Text>
+        <View style={styles.lyricsContainer}>
+          {song.lyrics
+            ?.split('\n')
+            .filter(line => !line.trim().startsWith('#'))
+            .map((line, index) => {
+              const cleanedLine = line.replace(/\{[^}]+\}/g, '');
+              const parts = cleanedLine.split(/(\[[^\]]+\])/g);
+              return (
+                <Text key={index} style={styles.lyricsLine}>
+                  {parts.map((part, i) =>
+                    part.match(/^\[[^\]]+\]$/) ? (
+                      <Text key={i} style={styles.chordText}>
+                        {part}
+                      </Text>
+                    ) : (
+                      <Text key={i}>{part}</Text>
+                    )
+                  )}
+                </Text>
+              );
+            })}
+        </View>
       </ScrollView>
       <View style={styles.footer}>
         <TouchableOpacity style={styles.footerButton} onPress={toggleLike}>
@@ -256,12 +269,19 @@ const styles = StyleSheet.create({
   },
   chordButtonText: {
     fontSize: 14,
-    color: '#000',
+    color: '#f7f7f7',
   },
-  lyrics: {
+  lyricsContainer: {
     marginTop: 8,
+  },
+  lyricsLine: {
     fontSize: 16,
     lineHeight: 22,
+    flexWrap: 'wrap',
+  },
+  chordText: {
+    fontWeight: 'bold',
+    backgroundColor: '#f7f7f7',
   },
   modalOverlay: {
     flex: 1,
