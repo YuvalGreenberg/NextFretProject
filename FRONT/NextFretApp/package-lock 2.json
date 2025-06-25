@@ -13,17 +13,16 @@
         "@react-navigation/native-stack": "^7.3.20",
         "@react-navigation/stack": "^7.3.3",
         "expo": "53.0.12",
-        "expo-av": "~15.1.6",
         "expo-secure-store": "~14.2.3",
         "expo-status-bar": "~2.2.3",
         "prop-types": "^15.8.1",
         "react": "19.0.0",
         "react-native": "0.79.4",
+        "react-native-deck-swiper": "^1.1.7",
         "react-native-gesture-handler": "~2.24.0",
         "react-native-reanimated": "~3.17.4",
         "react-native-safe-area-context": "5.4.0",
-        "react-native-screens": "~4.11.1",
-        "whatwg-fetch": "^3.6.20"
+        "react-native-screens": "~4.11.1"
       },
       "devDependencies": {
         "@babel/core": "^7.20.0"
@@ -360,13 +359,13 @@
       }
     },
     "node_modules/@babel/helpers": {
-      "version": "7.27.6",
-      "resolved": "https://registry.npmjs.org/@babel/helpers/-/helpers-7.27.6.tgz",
-      "integrity": "sha512-muE8Tt8M22638HU31A3CgfSUciwz1fhATfoVai05aPXGor//CdWDCbnlY1yvBPo07njuVOCNGCSp/GTt12lIug==",
+      "version": "7.27.4",
+      "resolved": "https://registry.npmjs.org/@babel/helpers/-/helpers-7.27.4.tgz",
+      "integrity": "sha512-Y+bO6U+I7ZKaM5G5rDUZiYfUvQPUibYmAFe7EnKdnKBbVXDZxvp+MWOH5gYciY0EPk4EScsuFMQBbEfpdRKSCQ==",
       "license": "MIT",
       "dependencies": {
         "@babel/template": "^7.27.2",
-        "@babel/types": "^7.27.6"
+        "@babel/types": "^7.27.3"
       },
       "engines": {
         "node": ">=6.9.0"
@@ -1434,9 +1433,9 @@
       }
     },
     "node_modules/@babel/runtime": {
-      "version": "7.27.6",
-      "resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.27.6.tgz",
-      "integrity": "sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==",
+      "version": "7.27.4",
+      "resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.27.4.tgz",
+      "integrity": "sha512-t3yaEOuGu9NlIZ+hIeGbBjFtZT7j2cb2tg0fuaJKeGotchRjjLfrBA9Kwf8quhpP1EUuxModQg04q/mBwyg8uA==",
       "license": "MIT",
       "engines": {
         "node": ">=6.9.0"
@@ -1494,9 +1493,9 @@
       }
     },
     "node_modules/@babel/types": {
-      "version": "7.27.6",
-      "resolved": "https://registry.npmjs.org/@babel/types/-/types-7.27.6.tgz",
-      "integrity": "sha512-ETyHEk2VHHvl9b9jZP5IHPavHYk57EhanlRRuae9XCpb/j5bDCbPPMOBfCWhnl/7EDJz0jEMCi/RhccCE8r1+Q==",
+      "version": "7.27.3",
+      "resolved": "https://registry.npmjs.org/@babel/types/-/types-7.27.3.tgz",
+      "integrity": "sha512-Y1GkI4ktrtvmawoSq+4FCVHNryea6uR+qUQy0AGxLSsjCX0nVmkYQMBLHDkXZuo5hGx7eYdnIaslsdBFm7zbUw==",
       "license": "MIT",
       "dependencies": {
         "@babel/helper-string-parser": "^7.27.1",
@@ -1590,6 +1589,15 @@
         "expo-internal": "build/bin/cli"
       }
     },
+    "node_modules/@expo/cli/node_modules/getenv": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/getenv/-/getenv-2.0.0.tgz",
+      "integrity": "sha512-VilgtJj/ALgGY77fiLam5iD336eSWi96Q15JSAG1zi8NRBysm3LXKdGnHb4m5cuyxvOLQQKWpBZAT6ni4FI2iQ==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6"
+      }
+    },
     "node_modules/@expo/cli/node_modules/semver": {
       "version": "7.7.2",
       "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.2.tgz",
@@ -1655,6 +1663,15 @@
         "xml2js": "0.6.0"
       }
     },
+    "node_modules/@expo/config-plugins/node_modules/getenv": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/getenv/-/getenv-2.0.0.tgz",
+      "integrity": "sha512-VilgtJj/ALgGY77fiLam5iD336eSWi96Q15JSAG1zi8NRBysm3LXKdGnHb4m5cuyxvOLQQKWpBZAT6ni4FI2iQ==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6"
+      }
+    },
     "node_modules/@expo/config-plugins/node_modules/semver": {
       "version": "7.7.2",
       "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.2.tgz",
@@ -1680,15 +1697,6 @@
       "license": "MIT",
       "dependencies": {
         "@babel/highlight": "^7.10.4"
-      }
-    },
-    "node_modules/@expo/config/node_modules/getenv": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/getenv/-/getenv-1.0.0.tgz",
-      "integrity": "sha512-7yetJWqbS9sbn0vIfliPsFgoXMKn/YMF+Wuiog97x+urnSRRRZ7xB+uVkwGKzRgq9CDFfMQnE9ruL5DHv9c6Xg==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=6"
       }
     },
     "node_modules/@expo/config/node_modules/semver": {
@@ -1736,15 +1744,6 @@
         "getenv": "^1.0.0"
       }
     },
-    "node_modules/@expo/env/node_modules/getenv": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/getenv/-/getenv-1.0.0.tgz",
-      "integrity": "sha512-7yetJWqbS9sbn0vIfliPsFgoXMKn/YMF+Wuiog97x+urnSRRRZ7xB+uVkwGKzRgq9CDFfMQnE9ruL5DHv9c6Xg==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=6"
-      }
-    },
     "node_modules/@expo/fingerprint": {
       "version": "0.13.1",
       "resolved": "https://registry.npmjs.org/@expo/fingerprint/-/fingerprint-0.13.1.tgz",
@@ -1766,6 +1765,15 @@
       },
       "bin": {
         "fingerprint": "bin/cli.js"
+      }
+    },
+    "node_modules/@expo/fingerprint/node_modules/getenv": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/getenv/-/getenv-2.0.0.tgz",
+      "integrity": "sha512-VilgtJj/ALgGY77fiLam5iD336eSWi96Q15JSAG1zi8NRBysm3LXKdGnHb4m5cuyxvOLQQKWpBZAT6ni4FI2iQ==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6"
       }
     },
     "node_modules/@expo/fingerprint/node_modules/semver": {
@@ -1795,15 +1803,6 @@
         "semver": "^7.6.0",
         "temp-dir": "~2.0.0",
         "unique-string": "~2.0.0"
-      }
-    },
-    "node_modules/@expo/image-utils/node_modules/getenv": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/getenv/-/getenv-1.0.0.tgz",
-      "integrity": "sha512-7yetJWqbS9sbn0vIfliPsFgoXMKn/YMF+Wuiog97x+urnSRRRZ7xB+uVkwGKzRgq9CDFfMQnE9ruL5DHv9c6Xg==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=6"
       }
     },
     "node_modules/@expo/image-utils/node_modules/semver": {
@@ -1862,6 +1861,15 @@
         "minimatch": "^9.0.0",
         "postcss": "~8.4.32",
         "resolve-from": "^5.0.0"
+      }
+    },
+    "node_modules/@expo/metro-config/node_modules/getenv": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/getenv/-/getenv-2.0.0.tgz",
+      "integrity": "sha512-VilgtJj/ALgGY77fiLam5iD336eSWi96Q15JSAG1zi8NRBysm3LXKdGnHb4m5cuyxvOLQQKWpBZAT6ni4FI2iQ==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6"
       }
     },
     "node_modules/@expo/osascript": {
@@ -2606,29 +2614,6 @@
       "integrity": "sha512-247/8pHghbYY2wKjJpUsY6ZNbWcdUa5j5517LZMn6pXrbSSgWuj3JA4OYibNnocCHBaVrt+3R8XC3VEJqLlHFg==",
       "license": "MIT"
     },
-    "node_modules/@react-native/virtualized-lists": {
-      "version": "0.79.4",
-      "resolved": "https://registry.npmjs.org/@react-native/virtualized-lists/-/virtualized-lists-0.79.4.tgz",
-      "integrity": "sha512-0Mdcox6e5PTonuM1WIo3ks7MBAa3IDzj0pKnE5xAwSgQ0DJW2P5dYf+KjWmpkE+Yb0w41ZbtXPhKq+U2JJ6C/Q==",
-      "license": "MIT",
-      "dependencies": {
-        "invariant": "^2.2.4",
-        "nullthrows": "^1.1.1"
-      },
-      "engines": {
-        "node": ">=18"
-      },
-      "peerDependencies": {
-        "@types/react": "^19.0.0",
-        "react": "*",
-        "react-native": "*"
-      },
-      "peerDependenciesMeta": {
-        "@types/react": {
-          "optional": true
-        }
-      }
-    },
     "node_modules/@react-navigation/core": {
       "version": "7.12.1",
       "resolved": "https://registry.npmjs.org/@react-navigation/core/-/core-7.12.1.tgz",
@@ -2647,10 +2632,16 @@
         "react": ">= 18.2.0"
       }
     },
+    "node_modules/@react-navigation/core/node_modules/react-is": {
+      "version": "19.1.0",
+      "resolved": "https://registry.npmjs.org/react-is/-/react-is-19.1.0.tgz",
+      "integrity": "sha512-Oe56aUPnkHyyDxxkvqtd7KkdQP5uIUfHxd5XTb3wE9d/kRnZLmKbDB0GWk919tdQ+mxxPtG6EAs6RMT6i1qtHg==",
+      "license": "MIT"
+    },
     "node_modules/@react-navigation/elements": {
-      "version": "2.5.2",
-      "resolved": "https://registry.npmjs.org/@react-navigation/elements/-/elements-2.5.2.tgz",
-      "integrity": "sha512-aGC3ukF5+lXuiF5bK7bJyRuWCE+Tk4MZ3GoQpAb7u7+m0KmsquliDhj4UCWEUU5kUoCeoRAUvv+1lKcYKf+WTQ==",
+      "version": "2.5.1",
+      "resolved": "https://registry.npmjs.org/@react-navigation/elements/-/elements-2.5.1.tgz",
+      "integrity": "sha512-0hNo+yaBNteK6lNKaSvo1dl/7TD+95vw2BIYBz1PYA2LhLL1B7SIARaVfccChhk4sa46szrTc8gbX0LSln2fcQ==",
       "license": "MIT",
       "dependencies": {
         "color": "^4.2.3",
@@ -2688,12 +2679,12 @@
       }
     },
     "node_modules/@react-navigation/native-stack": {
-      "version": "7.3.21",
-      "resolved": "https://registry.npmjs.org/@react-navigation/native-stack/-/native-stack-7.3.21.tgz",
-      "integrity": "sha512-oNNZHzkxILEibesamRKLodfXAaDOUvMBITKXLLeblDxnTAyIB/Kf7CmV+8nwkdAgV04kURTxV0SQI+d8gLUm6g==",
+      "version": "7.3.20",
+      "resolved": "https://registry.npmjs.org/@react-navigation/native-stack/-/native-stack-7.3.20.tgz",
+      "integrity": "sha512-igG1bxVJ/GR9IeNeHCSC/Ax0efZUVIWjW4ZkJvXC8D+Rjgwfr8jmWfk9nGCyaTaj5lvrb8Gwv0bnObalGqr2Yw==",
       "license": "MIT",
       "dependencies": {
-        "@react-navigation/elements": "^2.5.2",
+        "@react-navigation/elements": "^2.5.1",
         "warn-once": "^0.1.1"
       },
       "peerDependencies": {
@@ -2714,16 +2705,16 @@
       }
     },
     "node_modules/@react-navigation/stack": {
-      "version": "7.4.2",
-      "resolved": "https://registry.npmjs.org/@react-navigation/stack/-/stack-7.4.2.tgz",
-      "integrity": "sha512-QlqBxKBfKVx/XRH04pRRGQ92tO1fV0RL7YEw5G4pew6CNY26102dVQl5A39ZztvlvEDQbCQkatyDS7i2xR1QiA==",
+      "version": "7.3.3",
+      "resolved": "https://registry.npmjs.org/@react-navigation/stack/-/stack-7.3.3.tgz",
+      "integrity": "sha512-TIUiQKSFYjVwRAT5pFn1jIk4aqPMgeh5eTXzsxgnAxrqrmE9E1o1XaZj+aeqBhTeBKxPTaRSjzsayD2/cue0mA==",
       "license": "MIT",
       "dependencies": {
-        "@react-navigation/elements": "^2.5.2",
+        "@react-navigation/elements": "^2.4.3",
         "color": "^4.2.3"
       },
       "peerDependencies": {
-        "@react-navigation/native": "^7.1.14",
+        "@react-navigation/native": "^7.1.10",
         "react": ">= 18.2.0",
         "react-native": "*",
         "react-native-gesture-handler": ">= 2.0.0",
@@ -2836,12 +2827,12 @@
       }
     },
     "node_modules/@types/node": {
-      "version": "24.0.4",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-24.0.4.tgz",
-      "integrity": "sha512-ulyqAkrhnuNq9pB76DRBTkcS6YsmDALy6Ua63V8OhrOBgbcYt6IOdzpw5P1+dyRIyMerzLkeYWBeOXPpA9GMAA==",
+      "version": "22.15.29",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.15.29.tgz",
+      "integrity": "sha512-LNdjOkUDlU1RZb8e1kOIUpN1qQUlzGkEtbVNo53vbrwDg5om6oduhm4SiUaPW5ASTXhAiP0jInWG8Qx9fVlOeQ==",
       "license": "MIT",
       "dependencies": {
-        "undici-types": "~7.8.0"
+        "undici-types": "~6.21.0"
       }
     },
     "node_modules/@types/stack-utils": {
@@ -3478,9 +3469,9 @@
       }
     },
     "node_modules/caniuse-lite": {
-      "version": "1.0.30001724",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001724.tgz",
-      "integrity": "sha512-WqJo7p0TbHDOythNTqYujmaJTvtYRZrjpP8TCvH6Vb9CYJerJNKamKzIWOM4BkQatWj9H2lYulpdAQNBe7QhNA==",
+      "version": "1.0.30001720",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001720.tgz",
+      "integrity": "sha512-Ec/2yV2nNPwb4DnTANEV99ZWwm3ZWfdlfkQbWSDDt+PsXEVYwlhPH8tdMaPunYTKKmz7AnHi2oNEi1GcmKCD8g==",
       "funding": [
         {
           "type": "opencollective",
@@ -4003,9 +3994,9 @@
       "license": "MIT"
     },
     "node_modules/electron-to-chromium": {
-      "version": "1.5.173",
-      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.173.tgz",
-      "integrity": "sha512-2bFhXP2zqSfQHugjqJIDFVwa+qIxyNApenmXTp9EjaKtdPrES5Qcn9/aSFy/NaP2E+fWG/zxKu/LBvY36p5VNQ==",
+      "version": "1.5.162",
+      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.162.tgz",
+      "integrity": "sha512-hQA+Zb5QQwoSaXJWEAGEw1zhk//O7qDzib05Z4qTqZfNju/FAkrm5ZInp0JbTp4Z18A6bilopdZWEYrFSsfllA==",
       "license": "ISC"
     },
     "node_modules/emoji-regex": {
@@ -4175,23 +4166,6 @@
         "expo": "*",
         "react": "*",
         "react-native": "*"
-      }
-    },
-    "node_modules/expo-av": {
-      "version": "15.1.6",
-      "resolved": "https://registry.npmjs.org/expo-av/-/expo-av-15.1.6.tgz",
-      "integrity": "sha512-5ZbeXdCmdckZHwtEV+8tRZqLlUWR96gkkUIxpyZAEvK0L+aI/BnyhDCpjnSKWwZo4ZA6lx8/su9kyFNV/mQ/sQ==",
-      "license": "MIT",
-      "peerDependencies": {
-        "expo": "*",
-        "react": "*",
-        "react-native": "*",
-        "react-native-web": "*"
-      },
-      "peerDependenciesMeta": {
-        "react-native-web": {
-          "optional": true
-        }
       }
     },
     "node_modules/expo-constants": {
@@ -4491,9 +4465,9 @@
       }
     },
     "node_modules/getenv": {
-      "version": "2.0.0",
-      "resolved": "https://registry.npmjs.org/getenv/-/getenv-2.0.0.tgz",
-      "integrity": "sha512-VilgtJj/ALgGY77fiLam5iD336eSWi96Q15JSAG1zi8NRBysm3LXKdGnHb4m5cuyxvOLQQKWpBZAT6ni4FI2iQ==",
+      "version": "1.0.0",
+      "resolved": "https://registry.npmjs.org/getenv/-/getenv-1.0.0.tgz",
+      "integrity": "sha512-7yetJWqbS9sbn0vIfliPsFgoXMKn/YMF+Wuiog97x+urnSRRRZ7xB+uVkwGKzRgq9CDFfMQnE9ruL5DHv9c6Xg==",
       "license": "MIT",
       "engines": {
         "node": ">=6"
@@ -6565,12 +6539,6 @@
         "url": "https://github.com/chalk/ansi-styles?sponsor=1"
       }
     },
-    "node_modules/pretty-format/node_modules/react-is": {
-      "version": "18.3.1",
-      "resolved": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
-      "integrity": "sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==",
-      "license": "MIT"
-    },
     "node_modules/proc-log": {
       "version": "4.2.0",
       "resolved": "https://registry.npmjs.org/proc-log/-/proc-log-4.2.0.tgz",
@@ -6749,9 +6717,9 @@
       }
     },
     "node_modules/react-is": {
-      "version": "19.1.0",
-      "resolved": "https://registry.npmjs.org/react-is/-/react-is-19.1.0.tgz",
-      "integrity": "sha512-Oe56aUPnkHyyDxxkvqtd7KkdQP5uIUfHxd5XTb3wE9d/kRnZLmKbDB0GWk919tdQ+mxxPtG6EAs6RMT6i1qtHg==",
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
+      "integrity": "sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==",
       "license": "MIT"
     },
     "node_modules/react-native": {
@@ -6812,6 +6780,12 @@
           "optional": true
         }
       }
+    },
+    "node_modules/react-native-deck-swiper": {
+      "version": "1.1.7",
+      "resolved": "https://registry.npmjs.org/react-native-deck-swiper/-/react-native-deck-swiper-1.1.7.tgz",
+      "integrity": "sha512-FRGyDGlYXWfFSHfIGACDJxjL+gmGkkpMyZ130flxvs4IM+PZzh83LY3KmEXzJIUcCQrUPTo2Bci23jcguUrJJw==",
+      "license": "ISC"
     },
     "node_modules/react-native-edge-to-edge": {
       "version": "1.6.0",
@@ -6896,6 +6870,29 @@
       "peerDependencies": {
         "react": "*",
         "react-native": "*"
+      }
+    },
+    "node_modules/react-native/node_modules/@react-native/virtualized-lists": {
+      "version": "0.79.4",
+      "resolved": "https://registry.npmjs.org/@react-native/virtualized-lists/-/virtualized-lists-0.79.4.tgz",
+      "integrity": "sha512-0Mdcox6e5PTonuM1WIo3ks7MBAa3IDzj0pKnE5xAwSgQ0DJW2P5dYf+KjWmpkE+Yb0w41ZbtXPhKq+U2JJ6C/Q==",
+      "license": "MIT",
+      "dependencies": {
+        "invariant": "^2.2.4",
+        "nullthrows": "^1.1.1"
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "peerDependencies": {
+        "@types/react": "^19.0.0",
+        "react": "*",
+        "react-native": "*"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
       }
     },
     "node_modules/react-native/node_modules/brace-expansion": {
@@ -8064,9 +8061,9 @@
       }
     },
     "node_modules/undici-types": {
-      "version": "7.8.0",
-      "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-7.8.0.tgz",
-      "integrity": "sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==",
+      "version": "6.21.0",
+      "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz",
+      "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==",
       "license": "MIT"
     },
     "node_modules/unicode-canonical-property-names-ecmascript": {

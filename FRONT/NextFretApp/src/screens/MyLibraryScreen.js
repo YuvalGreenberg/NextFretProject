@@ -70,15 +70,23 @@ export default function MyLibraryScreen({ navigation }) {
   return (
     
       <View style={styles.container}>       
-        <TextInput
-          style={styles.search}
-          placeholder="Search songs…"
-          value={query}
-          onChangeText={setQuery}
-        />
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Song, Artist"
+            placeholderTextColor="#888"
+            value={query}
+            onChangeText={setQuery}
+            underlineColorAndroid="transparent"
+          />
+        </View>
 
         {loading ? (
-          <ActivityIndicator size="large" style={styles.loading} />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color="#888" />
+            <Text style={styles.loadingText}>Please wait...</Text>
+          </View>
         ) : (
           filtered.length > 0
             ? <FlatList
@@ -87,7 +95,7 @@ export default function MyLibraryScreen({ navigation }) {
               keyExtractor={item => item.id.toString()}
             />
             : <View style={styles.empty}>
-              <Text>No songs added</Text>
+              <Text style = {styles.emptyText}>No songs added</Text>
             </View>
         )}
 
@@ -110,6 +118,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 12,
   },
+  /*
   search: {
     height: 40,
     borderWidth: 1,
@@ -118,6 +127,24 @@ const styles = StyleSheet.create({
     borderRadius: 4,
    // marginTop: -40,
     marginBottom: 8,
+  },
+  */
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    height: 40,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
   },
   list: {
     paddingBottom: 80, // keep FooterMenu visible
@@ -163,6 +190,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 8,
+    color: '#666',
+    fontSize: 14,
+  },
   // --- List row styles ---
   listItem: {
     flexDirection: 'row',
@@ -182,6 +219,16 @@ const styles = StyleSheet.create({
   listTitle: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  emptyText: {
+    flex: 1,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#888',
+    paddingHorizontal: 16,
+    paddingTop: 100,
   },
   listArtist: {
     fontSize: 14,

@@ -7,7 +7,9 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
+    Image,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import API_URL from '../config';
 
 export default function SearchScreen({ navigation }) {
@@ -38,37 +40,49 @@ export default function SearchScreen({ navigation }) {
     }, [searchTerm]);
 
     const renderItem = ({ item }) => (
-      <TouchableOpacity
-        style={styles.itemContainer}
-        onPress={() => navigation.navigate('SongDetail', { song: item })}
-      >
-        {/* Left side: title and artist */}
-        <View style={styles.itemTextContainer}>
-          <Text style={styles.itemTitle}>{item.title}</Text>
-          <Text style={styles.itemSubtitle}>{item.artist}</Text>
-        </View>
+        <TouchableOpacity
+            style={styles.itemContainer}
+            onPress={() => navigation.navigate('SongDetail', { song: item })}
+        >
+            {/* Left side: artwork */}
+            <Image
+                source={item.coverUrl ? { uri: item.coverUrl } : require('../../assets/album-place-holder.png')}
+                style={styles.itemImage}
+                resizeMode="cover"
+            />
 
-        {/* Right side: chord badges */}
-        <View style={styles.chordListContainer}>
-          {item.chordList?.map(chord => (
-            <View key={chord.id} style={styles.chordBadge}>
-              <Text style={styles.chordBadgeText}>{chord.name}</Text>
+           
+
+            {/* Center: title and artist */}
+            <View style={styles.itemTextContainer}>
+                <Text style={styles.itemTitle}>{item.title}</Text>
+                <Text style={styles.itemSubtitle}>{item.artist}</Text>
             </View>
-          ))}
-        </View>
-      </TouchableOpacity>
+
+            {/* Right side: chord badges */}
+            <View style={styles.chordListContainer}>
+                {item.chordList?.map(chord => (
+                    <View key={chord.id} style={styles.chordBadge}>
+                        <Text style={styles.chordBadgeText}>{chord.name}</Text>
+                    </View>
+                ))}
+            </View>
+        </TouchableOpacity>
     );
 
     return (
         <View style={styles.container}>
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Artists, Songs"
-                value={searchTerm}
-                onChangeText={setSearchTerm}
-                autoCapitalize="none"
-                clearButtonMode="while-editing"
-            />
+            <View style={styles.searchBarContainer}>
+                <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Song, Artist"
+                    value={searchTerm}
+                    onChangeText={setSearchTerm}
+                    autoCapitalize="none"
+                    clearButtonMode="while-editing"
+                />
+            </View>
             {loading ? (
                 <ActivityIndicator style={styles.loader} size="small" />
             ) : (
@@ -93,13 +107,21 @@ const styles = StyleSheet.create({
         padding: 16,
         //marginTop: -40,
     },
-    searchInput: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
+    searchBarContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
+        height: 40,
         marginBottom: 12,
+    },
+    searchIcon: {
+        marginRight: 8,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
     },
     loader: {
         marginTop: 20,
@@ -114,6 +136,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
+        paddingRight: 8,
     },
     itemTextContainer: {
         flex: 1,
@@ -140,5 +163,11 @@ const styles = StyleSheet.create({
         color: '#888',
         paddingHorizontal: 16,
         paddingTop: 100, // כדי למרכז ויזואלית בגובה
-      },
+    },
+    itemImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 4,
+        marginRight: 12,
+    },
 });

@@ -4,14 +4,15 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Alert,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const { signIn } = useContext(AuthContext);
@@ -52,45 +53,101 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button title="Login" onPress={handleLogin} />
-      <Text
-        style={styles.link}
-        onPress={() => navigation.navigate('Register')}
-      >
-        Don't have an account? Register
+      <Text style={styles.subtitle}>Please sign in to continue.</Text>
+
+      <View style={styles.inputWrapper}>
+        <Ionicons name="mail-outline" size={20} color="#555" style={styles.inputIcon} />
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          style={styles.input}
+          placeholderTextColor="#aaa"
+        />
+      </View>
+
+      <View style={styles.inputWrapper}>
+        <Ionicons name="lock-closed-outline" size={20} color="#555" style={styles.inputIcon} />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+          placeholderTextColor="#aaa"
+        />
+      </View>
+
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>LOGIN</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.link}>
+        Don’t have an account? <Text style={styles.linkHighlight} onPress={() => navigation.navigate('Register')}>Sign up</Text>
       </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  title: { fontSize: 24, marginBottom: 24, textAlign: 'center' },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
+  container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 160 },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 24,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingHorizontal: 12,
     marginBottom: 16,
-    borderRadius: 4,
+    marginHorizontal: 8,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  inputIcon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 12,
+  },
+  loginButton: {
+    backgroundColor: '#386641',
+    paddingVertical: 14,
+    borderRadius: 24,
+    marginHorizontal: 8,
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   link: {
-    marginTop: 16,
-    color: 'blue',
+    marginTop: 24,
+    color: '#444',
     textAlign: 'center',
+    fontSize: 14,
+  },
+  linkHighlight: {
+    color: '#386641',
+    fontWeight: 'bold',
   },
 });

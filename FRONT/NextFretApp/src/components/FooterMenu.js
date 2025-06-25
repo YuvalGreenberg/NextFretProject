@@ -1,6 +1,6 @@
 // src/components/FooterMenu.js
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -20,19 +20,31 @@ export default function FooterMenu() {
       </TouchableOpacity> */}
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MyLibrary')}>
-        <Ionicons name={icon('MyLibrary', 'library', 'library-outline')} size={24} color="#386641" />
+        <View style={{ alignItems: 'center' }}>
+          <Ionicons name={icon('MyLibrary', 'library', 'library-outline')} size={24} color="#386641" />
+          <Text style={styles.label}>Library</Text>
+        </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RecommendationScreen')}>
-        <Ionicons name={icon('RecommendationScreen', 'sparkles', 'sparkles-outline')} size={24} color="#386641" />
+        <View style={{ alignItems: 'center' }}>
+          <Ionicons name={icon('RecommendationScreen', 'sparkles', 'sparkles-outline')} size={24} color="#386641" />
+          <Text style={styles.label}>Discover</Text>
+        </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Search')}>
-        <Ionicons name={icon('Search', 'search', 'search-outline')} size={24} color="#386641" />
+        <View style={{ alignItems: 'center' }}>
+          <Ionicons name={icon('Search', 'search', 'search-outline')} size={24} color="#386641" />
+          <Text style={styles.label}>Search</Text>
+        </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')}>
-        <Ionicons name={icon('Profile', 'person', 'person-outline')} size={24} color="#386641" />
+        <View style={{ alignItems: 'center' }}>
+          <Ionicons name={icon('Profile', 'person', 'person-outline')} size={24} color="#386641" />
+          <Text style={styles.label}>Profile</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -58,5 +70,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',     
     marginBottom: 20,// פה תיזמו את הפדינג
+  },
+  label: {
+    fontSize: 10,
+    color: '#386641',
+    marginTop: 4,
   },
 });

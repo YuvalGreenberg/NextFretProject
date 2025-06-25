@@ -1,5 +1,5 @@
 // src/screens/RecommendationsGridScreen.js
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  Animated,
 } from 'react-native';
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
@@ -18,6 +19,7 @@ export default function RecommendationsGridScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [userChords, setUserChords] = useState([]);
   const [maxUnknown, setMaxUnknown] = useState(0);
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const param = `?maxUnknown=${maxUnknown}`;
@@ -66,36 +68,56 @@ export default function RecommendationsGridScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  const renderFilterButtons = () => {
-    const options = [
-      { label: 'practice', value: 0 },
-      { label: 'learn new chord', value: 1 }
-    ];
-
-    return (
-      <View style={styles.buttonGroup}>
-        {options.map(btn => (
-          <TouchableOpacity
-            key={btn.value}
-            style={[
-              styles.filterButton,
-              maxUnknown === btn.value && styles.filterButtonSelected
-            ]}
-            onPress={() => setMaxUnknown(btn.value)}
-          >
-            <Text style={styles.filterButtonText}>{btn.label}</Text>
-          </TouchableOpacity>
-        ))}
+  const renderFilterToggle = () => (
+    <View style={styles.toggleContainer}>
+      <View style={{ flexDirection: 'row', position: 'relative', width: '100%' }}>
+        <Animated.View style={[styles.animatedHighlight, {
+          left: slideAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0%', '50%'],
+          }),
+        }]} />
+        <TouchableOpacity
+          style={[styles.toggleOption, { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 }]}
+          onPress={() => {
+            setLoading(true);
+            Animated.timing(slideAnim, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false,
+            }).start(() => setMaxUnknown(0));
+          }}
+        >
+          <Text style={[styles.toggleText, maxUnknown === 0 && styles.toggleTextSelected]}>Practice</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.toggleOption, { borderTopRightRadius: 20, borderBottomRightRadius: 20 }]}
+          onPress={() => {
+            setLoading(true);
+            Animated.timing(slideAnim, {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: false,
+            }).start(() => setMaxUnknown(1));
+          }}
+        >
+          <Text style={[styles.toggleText, maxUnknown === 1 && styles.toggleTextSelected]}>Learn</Text>
+        </TouchableOpacity>
       </View>
-    );
-  };
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {renderFilterButtons()}
+      {renderFilterToggle()}
 
       {loading ? (
-        <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+          <ActivityIndicator size="small" />
+          <Text style={{ marginTop: 10, fontSize: 16, color: '#555' }}>
+            Fetching songs tailored for you...
+          </Text>
+        </View>
       ) : songs.length === 0 ? (
         <Text style={styles.emptyText}>There are no available songs to practice.</Text>
       ) : (
@@ -134,7 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
   filterButtonSelected: {
-    backgroundColor: '#86c5ff',
+    backgroundColor: '#81b29a',
   },
   filterButtonText: {
     fontSize: 16,
@@ -196,5 +218,42 @@ const styles = StyleSheet.create({
     color: '#888',
     paddingHorizontal: 16,
     paddingTop: 100,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    maxWidth: 250,
+    backgroundColor: '#eee',
+    borderRadius: 20,
+    marginBottom: 12,
+    paddingHorizontal: 0,
+  },
+  toggleOption: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    
+  },
+  toggleOptionSelected: {
+    backgroundColor: '#81b29a',
+    borderRadius: 20,
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#444',
+  },
+  toggleTextSelected: {
+    color: '#fff',
+  },
+  animatedHighlight: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: '50%',
+    backgroundColor: '#81b29a',
+    borderRadius: 20,
   },
 });

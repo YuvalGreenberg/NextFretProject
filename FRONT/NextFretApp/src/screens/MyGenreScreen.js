@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
 
@@ -97,7 +98,7 @@ export default function MyGenresScreen({ navigation }) {
     <TouchableOpacity
       style={[
         styles.genreGridItem,
-        { backgroundColor: item.liked ? '#A7C957' : '#F2E8CF' },
+        { backgroundColor: item.liked ? '#A7C957' : '#f7f7f7' },
       ]}
       onPress={() => handleToggleGenre(item)}
       activeOpacity={0.7}
@@ -110,15 +111,17 @@ export default function MyGenresScreen({ navigation }) {
     <View style={styles.container}>
       
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search genres..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        autoCapitalize="none"
-        autoCorrect={false}
-        clearButtonMode="while-editing"
-      />
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Genre"
+          placeholderTextColor="#888"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          underlineColorAndroid="transparent"
+        />
+      </View>
 
       {loading ? (
         <ActivityIndicator size="small" />
@@ -144,12 +147,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   title: { fontSize: 24, marginBottom: 8, textAlign: 'center' },
   searchInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
     marginBottom: 12,
+    height: 40,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   genreGridItem: {
     flex: 1,

@@ -502,7 +502,7 @@ public class Db {
      */
     public List<Song> searchSongs(String query) {
         List<Song> songs = new ArrayList<>();
-        String sql = "SELECT s.id, s.title, s.lyrics, a.name AS artist_name " +
+        String sql = "SELECT s.id, s.title, s.lyrics, s.artwork_url, a.name AS artist_name " +
                 "FROM songs s " +
                 "JOIN artist_songs aps ON s.id = aps.song_id " +
                 "JOIN artists a ON aps.artist_id = a.id " +
@@ -517,6 +517,7 @@ public class Db {
                     s.setTitle(rs.getString("title"));
                     s.setLyrics(rs.getString("lyrics"));
                     s.setArtistName(rs.getString("artist_name"));
+                    s.setCoverUrl(rs.getString("artwork_url"));
                     songs.add(s);
                 }
             }
@@ -534,26 +535,31 @@ public class Db {
                 "  SELECT chord_id FROM user_chords WHERE user_id = ?" +
                 ") " +
                 "SELECT s.id, s.title, s.lyrics, a.name AS artist_name, s.artwork_url, " +
-                "  SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN 1 ELSE 0 END) AS unknown_chords "
-                +
+                "  SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN 1 ELSE 0 END) AS unknown_chords " +
                 "FROM songs s " +
                 "JOIN song_chords sc ON s.id = sc.song_id " +
                 "JOIN chords c ON sc.chord_id = c.id " +
                 "LEFT JOIN artists a ON s.artist_id = a.id " +
+                "LEFT JOIN song_genres sg ON s.id = sg.song_id " +
                 "WHERE s.id NOT IN (" +
                 "  SELECT song_id FROM user_songs WHERE user_id = ?" +
                 ") " +
+                "AND (EXISTS (SELECT 1 FROM song_genres sg2 " +
+                "JOIN user_genres ug2 ON sg2.genre_id = ug2.genre_id " +
+                "WHERE sg2.song_id = s.id AND ug2.user_id = ?)) " +
                 "GROUP BY s.id, s.title, s.lyrics, a.name, s.artwork_url " +
                 "HAVING SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN 1 ELSE 0 END) = ? " +
-                "ORDER BY random() " +
+                "ORDER BY COUNT(DISTINCT CASE WHEN sg.genre_id IN (SELECT genre_id FROM user_genres WHERE user_id = ?) THEN sg.genre_id END) DESC, random() " +
                 "LIMIT 20";
 
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setLong(1, userId);
-            stmt.setLong(2, userId);
-            stmt.setInt(3, maxUnknown);
+            stmt.setLong(1, userId);  // user_known subquery
+            stmt.setLong(2, userId);  // NOT IN user_songs
+            stmt.setLong(3, userId);  // genre filter subquery
+            stmt.setInt(4, maxUnknown);  // HAVING
+            stmt.setLong(5, userId);  // ORDER BY genre match
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

@@ -3,8 +3,10 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
+import { Audio } from 'expo-av';
 
-export default function SongDetailScreen({ route , navigation }) {
+
+export default function SongDetailScreen({ route, navigation }) {
   // smallSong מגיע מהניווט ומכיל רק id (ואולי כותרת)
   const { song: smallSong } = route.params;
   const { userId } = useContext(AuthContext);
@@ -14,6 +16,8 @@ export default function SongDetailScreen({ route , navigation }) {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(!!smallSong?.isLiked);
   const [userChords, setUserChords] = useState([]);
+  const [sound, setSound] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // משיכה של הפרטים המלאים מהשרת
   useEffect(() => {
@@ -29,6 +33,17 @@ export default function SongDetailScreen({ route , navigation }) {
   }, [songId, userId]);
 
   useEffect(() => {
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      staysActiveInBackground: false,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+    });
+  }, []);
+
+  useEffect(() => {
     fetch(`${API_URL}/api/userManager/${userId}/chords`)
       .then(res => res.json())
       .then(data => {
@@ -37,6 +52,40 @@ export default function SongDetailScreen({ route , navigation }) {
       })
       .catch(console.error);
   }, [userId]);
+
+  const playPreview = async () => {
+    if (!song.previewUrl) return;
+
+    try {
+      if (sound) {
+        const status = await sound.getStatusAsync();
+        if (status.isPlaying) {
+          await sound.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          await sound.playAsync();
+          setIsPlaying(true);
+        }
+        return;
+      }
+
+      const newSound = new Audio.Sound();
+      await newSound.loadAsync({ uri: song.previewUrl }, {}, true);
+      await newSound.playAsync();
+      setSound(newSound);
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('🎵 Failed to play preview:', error);
+    }
+  };
+
+  useEffect(() => {
+    return sound
+      ? () => {
+        sound.unloadAsync();
+      }
+      : undefined;
+  }, [sound]);
 
   // מצב טעינה
   if (loading) {
@@ -64,60 +113,78 @@ export default function SongDetailScreen({ route , navigation }) {
     fetch(likeUrl, {
       method: newLiked ? 'POST' : 'DELETE'
     })
-    .catch(console.error);
+      .catch(console.error);
   };
 
   return (
-    
-      
-        <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.headerContainer}>
-            {song.coverUrl && (
-              <Image
-                source={{ uri: song.coverUrl }}
-                style={styles.coverImage}
-                resizeMode="cover"
-              />
-            )}
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.title}>{song.title}</Text>
-              <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
-              {/* <Text style={styles.sectionHeader}>Chords:</Text> */}
-              <View style={styles.chordList}>
-                {song.chordList?.length > 0 ? (
-                  song.chordList.map(c => {
-                    const known = userChords.includes(c.id);
-                    return (
-                      <TouchableOpacity
-                        key={c.id}
-                        style={[
-                          styles.chordButton,
-                          known ? styles.chordButtonKnown : styles.chordButtonUnknown
-                        ]}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.chordButtonText}>{c.name}</Text>
-                      </TouchableOpacity>
-                    );
-                  })
-                ) : (
-                  <Text style={styles.chordButtonText}>No chords available.</Text>
-                )}
-              </View>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
-            <Ionicons
-              name={liked ? 'heart' : 'heart-outline'}
-              size={28}
-              color={liked ? 'red' : 'grey'}
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.headerContainer}>
+          {song.coverUrl && (
+            <Image
+              source={{ uri: song.coverUrl }}
+              style={styles.coverImage}
+              resizeMode="cover"
             />
-          </TouchableOpacity>
+          )}
+          <View style={styles.headerTextContainer}>
 
-          <Text style={styles.sectionHeader}>Lyrics:</Text>
-          <Text style={styles.lyrics}>{song.lyrics || 'No lyrics available.'}</Text>
-        </ScrollView>
-     
+            <Text style={styles.title}>{song.title}</Text>
+            <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
+            {/* <Text style={styles.sectionHeader}>Chords:</Text> */}
+          </View>
+        </View>
+
+        <View style={styles.chordList}>
+          {song.chordList?.length > 0 ? (
+            song.chordList.map(c => {
+              const known = userChords.includes(c.id);
+              return (
+                <TouchableOpacity
+                  key={c.id}
+                  style={[
+                    styles.chordButton,
+                    known ? styles.chordButtonKnown : styles.chordButtonUnknown
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.chordButtonText}>{c.name}</Text>
+                </TouchableOpacity>
+              );
+            })
+          ) : (
+            <Text style={styles.chordButtonText}>No chords available.</Text>
+          )}
+        </View>
+
+        
+        <Text style={styles.lyrics}>
+          {(song.lyrics || 'No lyrics available.')
+            .split('\n')
+            .filter(line => !line.trim().startsWith('#')) // remove lines starting with #
+            .map(line => line.replace(/\{[^}]+\}/g, '')) // remove {...} comments
+            .join('\n')
+            .replace(/\n{3,}/g, '\n\n') // collapse 3+ newlines to just 2
+            .trim()}
+        </Text>
+      </ScrollView>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={toggleLike}>
+          <Ionicons
+            name={liked ? 'heart' : 'heart-outline'}
+            size={28}
+            color={liked ? 'red' : 'grey'}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton} onPress={playPreview}>
+          <Ionicons
+            name={isPlaying ? "pause-outline" : "play-outline"}
+            size={28}
+            color={isPlaying ? 'grey' : 'grey'}
+          />
+        </TouchableOpacity>
+      </View>
+    </>
   );
 }
 
@@ -131,10 +198,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#fff',
+    paddingBottom: 100, // ensures content is visible above the fixed footer
   },
   likeButton: {
     alignSelf: 'flex-start',
-    marginBottom: 12,
+    // marginBottom removed, now handled by iconRow
   },
   headerContainer: {
     flexDirection: 'row',
@@ -171,6 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 16,
+    //alignSelf: 'flex-end',
   },
   chordButton: {
     paddingHorizontal: 8,
@@ -206,5 +275,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     overflow: 'hidden',
+  },
+
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    height: 80,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    backgroundColor: '#fff',    
+    zIndex: 10,
+  },
+  button: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',     
+    marginBottom: 20,// פה תיזמו את הפדינג
   },
 });

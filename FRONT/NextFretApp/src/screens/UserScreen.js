@@ -9,6 +9,7 @@ import {
     StyleSheet,
     Button,
     ScrollView,
+    Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AuthContext from '../contexts/AuthContext';
@@ -66,13 +67,30 @@ export default function UserScreen({ navigation }) {
     if (loading || !userInfo) {
         return (
             <View style={styles.loaderContainer}>
-                <ActivityIndicator size="large" />
+                <ActivityIndicator size="small" color="#888" />
+                <Text style={styles.loadingText}>Please wait...</Text>
             </View>
         );
     }
 
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+    const infoFields = [
+        { label: 'Email', value: capitalize(userInfo.email), icon: 'mail-outline' },
+        { label: 'First Name', value: capitalize(userInfo.firstName), icon: 'person-outline' },
+        { label: 'Last Name', value: capitalize(userInfo.lastName), icon: 'person-circle-outline' },
+    ];
+
+    // Handler for deleting the user account
+    const handleDeleteAccount = async () => {
+        // TODO: Add API call here
+        Alert.alert("Account Deleted", "This would delete the account. (API not implemented yet)");
+        signOut(); // Optional: log out after deletion
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            
             <View style={styles.headerRow}>
                 <Text style={styles.sectionTitle}>My Chords</Text>
                 <TouchableOpacity
@@ -82,18 +100,27 @@ export default function UserScreen({ navigation }) {
                     <Ionicons name="add" size={20} color="#386641" />
                 </TouchableOpacity>
             </View>
-            {/* גריד אקורדים שעטוף אוטומטית */}
-            <View style={styles.chordsContainer}>
-                {chords.map(item => (
-                    <TouchableOpacity
-                        key={item.id}
-                        style={styles.chordItem}
-                        onPress={() => navigation.navigate('ChordScreen', { chordId: item.id })}
-                    >
-                        <Text style={styles.chordText}>{item.name}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chordsContainer}
+            >
+                {chords.length > 0 ? (
+                    chords.map(item => (
+                        <TouchableOpacity
+                            key={item.id}
+                            style={styles.chordItem}
+                            onPress={() => navigation.navigate('ChordScreen', { chordId: item.id })}
+                        >
+                            <Text style={styles.chordText}>{item.name}</Text>
+                        </TouchableOpacity>
+                    ))
+                ) : (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', minWidth: '100%' }}>
+                        <Text style={styles.placeholderText}>Add Chords</Text>
+                    </View>
+                )}
+            </ScrollView>
 
             <View style={styles.headerRow}>
                 <Text style={styles.sectionTitle}>My Genres</Text>
@@ -109,51 +136,50 @@ export default function UserScreen({ navigation }) {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.genresContainer}
             >
-                {genres.map(item => (
-                    <View key={item.id} style={styles.genreItem}>
-                        <Text style={styles.chordText}>{item.title}</Text>
+                {genres.length > 0 ? (
+                    genres.map(item => (
+
+
+                        <View key={item.id} style={styles.genreItem}>
+                            <Text style={styles.chordText}>{item.title}</Text>
+                        </View>
+
+
+                    ))
+                ) : (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', minWidth: '100%' }}>
+                        <Text style={styles.placeholderText}>Add Genres</Text>
                     </View>
-                ))}
+                )}
             </ScrollView>
 
             <View style={styles.infoContainer}>
-                {[
-                    { label: 'Email', value: userInfo.email },
-                    { label: 'First Name', value: userInfo.firstName },
-                    { label: 'Last Name', value: userInfo.lastName },
-                    { label: 'Date of Birth', value: new Date(userInfo.dateOfBirth).toLocaleDateString() },
-                ].map((field, idx) => (
+                {infoFields.map((field, idx) => (
                     <View key={idx} style={{ marginBottom: 12 }}>
                         <Text style={styles.rowLabel}>{field.label}</Text>
-                        <TouchableOpacity style={styles.infoRow} activeOpacity={0.7}>
-                            <Text style={styles.rowValue}>{field.value}</Text>
-                            <Ionicons name="chevron-forward" size={18} color="#ccc" />
+                        <TouchableOpacity style={styles.inputWrapper} activeOpacity={0.7}>
+                            <Ionicons name={field.icon} size={20} color="#777" />
+                            <View>
+                                <Text style={styles.inputText}>{field.value}</Text>
+                            </View>
                         </TouchableOpacity>
                     </View>
                 ))}
 
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title="Change Password"
-                        onPress={() => navigation.navigate('ChangePasswordScreen')}
-                    />
-                </View>
+                <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('ChangePasswordScreen')}>
+                    <Text style={styles.actionButtonText}>Change Password</Text>
+                </TouchableOpacity>
 
-                <View style={styles.buttonContainer}>
-                    {/* <Button
-                        title="Logout"
-                        onPress={() => {
-                            signOut();
-                            navigation.replace('Login');
-                        }}
-                        color="red"
-                    /> */}
-                    <Button
-                        title="Logout"
-                        onPress={signOut} // מספיק
-                        color="red"
-                    />
-                </View>
+                <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#d9534f' }]} onPress={signOut}>
+                    <Text style={styles.actionButtonText}>Logout</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#999' }]}
+                  onPress={handleDeleteAccount}
+                >
+                  <Text style={styles.actionButtonText}>Delete Account</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -174,6 +200,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    loadingText: {
+        marginTop: 8,
+        color: '#666',
+        fontSize: 14,
+    },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
@@ -182,13 +213,14 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     chordItem: {
-        width: 52,               // רוחב העיגול
-        height: 52,              // גובה העיגול
-        borderRadius: 20,         // חצי מהרוחב/גובה = עיגול מושלם
+        paddingHorizontal: 14,
+        paddingVertical: 8,
         backgroundColor: '#f7f7f7',
+        borderRadius: 20,
+        margin: 4,
         alignItems: 'center',
         justifyContent: 'center',
-        margin: 4,                // רווח סביב כל עיגול
+        alignSelf: 'flex-start',
     },
     genreItem: {
         paddingHorizontal: 14,
@@ -205,7 +237,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     infoContainer: {
-        marginTop: 16,
+        marginTop: -30,
     },
     label: {
         fontSize: 14,
@@ -237,7 +269,6 @@ const styles = StyleSheet.create({
     },
     chordsContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',         // מאפשר עטיפה לשורה הבאה אם לא נכנס
         justifyContent: 'flex-start',
         marginBottom: 10,
     },
@@ -260,9 +291,57 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#777',
         marginBottom: 4,
+        marginLeft: 12,
     },
     rowValue: {
         fontSize: 16,
         fontWeight: '500',
+    },
+    placeholderText: {
+        flex: 1,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        fontSize: 20,
+        fontWeight: '500',
+        color: '#888',
+        paddingHorizontal: 16,
+         // Adjusted for better visibility
+        //paddingTop: 100,
+    },
+    actionButton: {
+        backgroundColor: '#FFA500',
+        paddingVertical: 14,
+        borderRadius: 24,
+        marginHorizontal: 8,
+        marginTop: 8,
+        alignItems: 'center',
+    },
+    actionButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        marginHorizontal: 8,
+        marginBottom: 16,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        height: 45,
+    },
+    inputText: {
+        paddingLeft: 8,
+        fontSize: 16,
+        fontWeight: '500',
+        flex: 1,
+        textAlignVertical: 'center',
+        lineHeight: 45, // Matches height of the wrapper
     },
 });

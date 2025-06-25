@@ -48,12 +48,12 @@ function AuthStack() {
       <Stack.Screen
         name="Login"
         component={LoginScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false , animation: 'fade', animationDuration: 100 }}
       />
       <Stack.Screen
         name="Register"
         component={RegisterScreen}
-        options={{ title: 'Register' }}
+        options={{ headerShown: false  , animation: 'fade', animationDuration: 100}}
       />
     </Stack.Navigator>
   );
@@ -104,7 +104,7 @@ function AppStack() {
       <Stack.Screen
         name="MyLibrary"
         options={{
-          title: 'My Library',
+          title: 'Library',
           headerBackVisible: false,
           animation: 'fade',
         }}
@@ -147,7 +147,7 @@ function AppStack() {
       </Stack.Screen>
       <Stack.Screen
         name="RecommendationScreen"
-        options={{ title: 'All Recommendations', animation: 'fade' , headerBackVisible: false}}
+        options={{ title: 'Discover', animation: 'fade' , headerBackVisible: false}}
       >
         {props => (
           <MainLayout>
@@ -160,15 +160,10 @@ function AppStack() {
         options={{
           title: 'Song Detail',
           animation: 'slide_from_bottom',
-          //presentation: 'transparentModal',
           animationDuration: 400,
         }}
       >
-        {props => (
-          <MainLayout>
-            <SongDetailScreen {...props} />
-          </MainLayout>
-        )}
+        {props => <SongDetailScreen {...props} />}
       </Stack.Screen>
     </Stack.Navigator>
   );
