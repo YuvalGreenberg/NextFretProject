@@ -17,9 +17,12 @@ public class RecommendationService {
         this.db = db;
     }
 
-    public List<Song> recommendSongsForUser(Long userId) {
-        
-        return db.getRecommendationsForUser(userId);
+    public List<Song> recommendSongsForUser(Long userId, Integer maxUnknown) {
+        if (maxUnknown != null) {
+            return db.getRecommendationsForUserWithMaxUnknown(userId, maxUnknown);
+        } else {
+            return db.getRecommendationsForUser(userId);
+        }
     }
 
     public List<Song> searchSongs(String query) {

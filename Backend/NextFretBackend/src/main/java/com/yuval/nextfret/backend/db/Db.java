@@ -3,6 +3,8 @@ package com.yuval.nextfret.backend.db;
 import com.yuval.nextfret.backend.entity.User;
 import com.yuval.nextfret.backend.entity.Song;
 import com.yuval.nextfret.backend.entity.Chord;
+import com.yuval.nextfret.backend.entity.Genre;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,9 +12,6 @@ import javax.annotation.PostConstruct;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Db.java – שכבת גישה ל־PostgreSQL, מקבלת את פרטי החיבור
@@ -348,7 +347,7 @@ public class Db {
 
     public List<Song> getLibraryByUserId(Long userId) {
         List<Song> songs = new ArrayList<>();
-        String sql = "SELECT s.id, s.title, s.lyrics, a.name AS artist_name, us.date_added " +
+        String sql = "SELECT s.id, s.title, s.lyrics, s.artwork_url, a.name AS artist_name, us.date_added " +
                 "FROM songs s " +
                 "JOIN user_songs us ON s.id = us.song_id " +
                 "LEFT JOIN artists a ON s.artist_id = a.id " +
@@ -364,6 +363,7 @@ public class Db {
                     s.setLyrics(rs.getString("lyrics"));
                     s.setArtistName(rs.getString("artist_name"));
                     s.setAddedDate(rs.getDate("date_added"));
+                    s.setCoverUrl(rs.getString("artwork_url")); // הוספת שורת הקאבר
                     songs.add(s);
                 }
             }
@@ -389,28 +389,50 @@ public class Db {
     }
 
     public Song getFullSongDetailsForUser(Long userId, Long songId) {
-        String songSql = "SELECT s.id, s.title, s.lyrics, a.name AS artist_name " +
-                "FROM songs s " +
-                "JOIN artists a ON s.artist_id = a.id " +
-                "WHERE s.id = ?";
+        String songSql = "SELECT s.id, s.title, s.lyrics, s.artwork_url, s.preview_url, a.name AS artist_name " +
+                         "FROM songs s " +
+                         "JOIN artists a ON s.artist_id = a.id " +
+                         "WHERE s.id = ?";
+    
         try (Connection conn = getConnection();
-                PreparedStatement songStmt = conn.prepareStatement(songSql)) {
+             PreparedStatement songStmt = conn.prepareStatement(songSql)) {
+    
             songStmt.setLong(1, songId);
             try (ResultSet rs = songStmt.executeQuery()) {
                 if (!rs.next()) {
-                    return null; // song not exist
+                    return null; // song does not exist
                 }
+    
                 Song song = new Song();
                 song.setId(rs.getLong("id"));
                 song.setTitle(rs.getString("title"));
                 song.setLyrics(rs.getString("lyrics"));
                 song.setArtistName(rs.getString("artist_name"));
-
+                song.setCoverUrl(rs.getString("artwork_url"));
+                song.setPreviewUrl(rs.getString("preview_url"));
+    
+                // Fetch genre object
+                String genreSql = "SELECT g.id, g.name " +
+                                  "FROM genres g " +
+                                  "JOIN song_genres sg ON sg.genre_id = g.id " +
+                                  "WHERE sg.song_id = ? LIMIT 1";
+                try (PreparedStatement genreStmt = conn.prepareStatement(genreSql)) {
+                    genreStmt.setLong(1, songId);
+                    try (ResultSet grs = genreStmt.executeQuery()) {
+                        if (grs.next()) {
+                            Genre genre = new Genre();
+                            genre.setId(grs.getLong("id"));
+                            genre.setTitle(grs.getString("name"));
+                            song.setGenre(genre);
+                        }
+                    }
+                }
+    
                 // Fetch chords for this song
                 String chordSql = "SELECT c.id, c.name, c.difficulty " +
-                        "FROM chords c " +
-                        "JOIN song_chords sc ON c.id = sc.chord_id " +
-                        "WHERE sc.song_id = ?";
+                                  "FROM chords c " +
+                                  "JOIN song_chords sc ON c.id = sc.chord_id " +
+                                  "WHERE sc.song_id = ?";
                 try (PreparedStatement chordStmt = conn.prepareStatement(chordSql)) {
                     chordStmt.setLong(1, songId);
                     try (ResultSet crs = chordStmt.executeQuery()) {
@@ -423,20 +445,22 @@ public class Db {
                             chordList.add(chord);
                         }
                         song.setChordList(chordList);
-
-                        // בדיקת האם השיר בלב ל־user_songs
-                        String likeSql = "SELECT 1 FROM user_songs us WHERE us.user_id = ? AND us.song_id = ? LIMIT 1";
-                        try (PreparedStatement likeStmt = conn.prepareStatement(likeSql)) {
-                            likeStmt.setLong(1, userId);
-                            likeStmt.setLong(2, songId);
-                            try (ResultSet lrs = likeStmt.executeQuery()) {
-                                song.setIsLiked(lrs.next());
-                            }
-                        }
                     }
                 }
+    
+                // Check if user liked the song
+                String likeSql = "SELECT 1 FROM user_songs us WHERE us.user_id = ? AND us.song_id = ? LIMIT 1";
+                try (PreparedStatement likeStmt = conn.prepareStatement(likeSql)) {
+                    likeStmt.setLong(1, userId);
+                    likeStmt.setLong(2, songId);
+                    try (ResultSet lrs = likeStmt.executeQuery()) {
+                        song.setIsLiked(lrs.next());
+                    }
+                }
+    
                 return song;
             }
+    
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Error fetching full song details for user: " + e.getMessage(), e);
@@ -469,37 +493,185 @@ public class Db {
         }
     }
 
-/**
- * Uses PostgreSQL full-text search for searching songs by title and artist name.
- * Make sure to create a GIN index for performance:
- *   CREATE INDEX songs_search_idx ON songs USING GIN (to_tsvector('simple', title));
- */
-public List<Song> searchSongs(String query) {
-    List<Song> songs = new ArrayList<>();
-    String sql =
-        "SELECT s.id, s.title, s.lyrics, a.name AS artist_name " +
-        "FROM songs s " +
-        "JOIN artist_songs aps ON s.id = aps.song_id " +
-        "JOIN artists a ON aps.artist_id = a.id " +
-        "WHERE to_tsvector('simple', s.title || ' ' || a.name) @@ plainto_tsquery('simple', ?)";
-    try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, query);
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Song s = new Song();
-                s.setId(rs.getLong("id"));
-                s.setTitle(rs.getString("title"));
-                s.setLyrics(rs.getString("lyrics"));
-                s.setArtistName(rs.getString("artist_name"));
-                songs.add(s);
+    /**
+     * Uses PostgreSQL full-text search for searching songs by title and artist
+     * name.
+     * Make sure to create a GIN index for performance:
+     * CREATE INDEX songs_search_idx ON songs USING GIN (to_tsvector('simple',
+     * title));
+     */
+    public List<Song> searchSongs(String query) {
+        List<Song> songs = new ArrayList<>();
+        String sql = "SELECT s.id, s.title, s.lyrics, a.name AS artist_name " +
+                "FROM songs s " +
+                "JOIN artist_songs aps ON s.id = aps.song_id " +
+                "JOIN artists a ON aps.artist_id = a.id " +
+                "WHERE to_tsvector('simple', s.title || ' ' || a.name) @@ plainto_tsquery('simple', ?)";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, query);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Song s = new Song();
+                    s.setId(rs.getLong("id"));
+                    s.setTitle(rs.getString("title"));
+                    s.setLyrics(rs.getString("lyrics"));
+                    s.setArtistName(rs.getString("artist_name"));
+                    songs.add(s);
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error searching songs: " + e.getMessage(), e);
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Error searching songs: " + e.getMessage(), e);
+        return songs;
     }
-    return songs;
-}
+
+    public List<Song> getRecommendationsForUserWithMaxUnknown(Long userId, Integer maxUnknown) {
+        List<Song> songs = new ArrayList<>();
+
+        String sql = "WITH user_known AS (" +
+                "  SELECT chord_id FROM user_chords WHERE user_id = ?" +
+                ") " +
+                "SELECT s.id, s.title, s.lyrics, a.name AS artist_name, s.artwork_url, " +
+                "  SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN 1 ELSE 0 END) AS unknown_chords "
+                +
+                "FROM songs s " +
+                "JOIN song_chords sc ON s.id = sc.song_id " +
+                "JOIN chords c ON sc.chord_id = c.id " +
+                "LEFT JOIN artists a ON s.artist_id = a.id " +
+                "WHERE s.id NOT IN (" +
+                "  SELECT song_id FROM user_songs WHERE user_id = ?" +
+                ") " +
+                "GROUP BY s.id, s.title, s.lyrics, a.name, s.artwork_url " +
+                "HAVING SUM(CASE WHEN sc.chord_id NOT IN (SELECT chord_id FROM user_known) THEN 1 ELSE 0 END) = ? " +
+                "ORDER BY random() " +
+                "LIMIT 20";
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, userId);
+            stmt.setLong(2, userId);
+            stmt.setInt(3, maxUnknown);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Song s = new Song();
+                    s.setId(rs.getLong("id"));
+                    s.setTitle(rs.getString("title"));
+                    s.setLyrics(rs.getString("lyrics"));
+                    s.setArtistName(rs.getString("artist_name"));
+                    s.setCoverUrl(rs.getString("artwork_url")); // ✅
+
+                    // Fetch chord list
+                    String chordSql = "SELECT c.id, c.name FROM chords c " +
+                            "JOIN song_chords sc2 ON c.id = sc2.chord_id " +
+                            "WHERE sc2.song_id = ?";
+                    try (PreparedStatement chordStmt = conn.prepareStatement(chordSql)) {
+                        chordStmt.setLong(1, s.getId());
+                        try (ResultSet crs = chordStmt.executeQuery()) {
+                            List<Chord> chordList = new ArrayList<>();
+                            while (crs.next()) {
+                                Chord chord = new Chord();
+                                chord.setId(crs.getLong("id"));
+                                chord.setName(crs.getString("name"));
+                                chordList.add(chord);
+                            }
+                            s.setChordList(chordList);
+                        }
+                    }
+
+                    songs.add(s);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error fetching filtered recommendations: " + e.getMessage(), e);
+        }
+
+        return songs;
+    }
+
+    public List<Genre> getFavoriteGenresForUser(Long userId) {
+        List<Genre> genres = new ArrayList<>();
+
+        String sql = "SELECT g.id, g.name " +
+                "FROM genres g " +
+                "JOIN user_genres ug ON g.id = ug.genre_id " +
+                "WHERE ug.user_id = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Genre genre = new Genre();
+                    genre.setId(rs.getLong("id"));
+                    genre.setTitle(rs.getString("name"));
+                    genres.add(genre);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error fetching favorite genres: " + e.getMessage(), e);
+        }
+
+        return genres;
+    }
+
+    public List<Genre> getAllGenres() {
+        List<Genre> genres = new ArrayList<>();
+        String sql = "SELECT id, name FROM genres";
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Genre g = new Genre();
+                g.setId(rs.getLong("id"));
+                g.setTitle(rs.getString("name"));
+                genres.add(g);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return genres;
+    }
+
+    public void addUserGenre(Long userId, Long genreId) {
+        String sql = "INSERT INTO user_genres (user_id, genre_id) VALUES (?, ?)";
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            stmt.setLong(2, genreId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error adding genre to user: " + e.getMessage());
+        }
+    }
+
+    public void deleteUserGenre(Long userId, Long genreId) {
+        String sql = "DELETE FROM user_genres WHERE user_id = ? AND genre_id = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            stmt.setLong(2, genreId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting genre from user: " + e.getMessage());
+        }
+    }
 
 }

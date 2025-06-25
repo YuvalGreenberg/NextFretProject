@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
@@ -71,6 +71,41 @@ export default function SongDetailScreen({ route , navigation }) {
     
       
         <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.headerContainer}>
+            {song.coverUrl && (
+              <Image
+                source={{ uri: song.coverUrl }}
+                style={styles.coverImage}
+                resizeMode="cover"
+              />
+            )}
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.title}>{song.title}</Text>
+              <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
+              {/* <Text style={styles.sectionHeader}>Chords:</Text> */}
+              <View style={styles.chordList}>
+                {song.chordList?.length > 0 ? (
+                  song.chordList.map(c => {
+                    const known = userChords.includes(c.id);
+                    return (
+                      <TouchableOpacity
+                        key={c.id}
+                        style={[
+                          styles.chordButton,
+                          known ? styles.chordButtonKnown : styles.chordButtonUnknown
+                        ]}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.chordButtonText}>{c.name}</Text>
+                      </TouchableOpacity>
+                    );
+                  })
+                ) : (
+                  <Text style={styles.chordButtonText}>No chords available.</Text>
+                )}
+              </View>
+            </View>
+          </View>
           <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
             <Ionicons
               name={liked ? 'heart' : 'heart-outline'}
@@ -78,32 +113,6 @@ export default function SongDetailScreen({ route , navigation }) {
               color={liked ? 'red' : 'grey'}
             />
           </TouchableOpacity>
-
-          <Text style={styles.title}>{song.title}</Text>
-          <Text style={styles.artist}>{song.artist || 'Unknown Artist'}</Text>
-
-          <Text style={styles.sectionHeader}>Chords:</Text>
-          <View style={styles.chordList}>
-            {song.chordList?.length > 0 ? (
-              song.chordList.map(c => {
-                const known = userChords.includes(c.id);
-                return (
-                  <TouchableOpacity
-                    key={c.id}
-                    style={[
-                      styles.chordButton,
-                      known ? styles.chordButtonKnown : styles.chordButtonUnknown
-                    ]}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.chordButtonText}>{c.name}</Text>
-                  </TouchableOpacity>
-                );
-              })
-            ) : (
-              <Text style={styles.chordButtonText}>No chords available.</Text>
-            )}
-          </View>
 
           <Text style={styles.sectionHeader}>Lyrics:</Text>
           <Text style={styles.lyrics}>{song.lyrics || 'No lyrics available.'}</Text>
@@ -124,21 +133,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   likeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 1,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  coverImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   artist: {
     fontSize: 18,
     color: '#555',
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: 16,
   },
   sectionHeader: {

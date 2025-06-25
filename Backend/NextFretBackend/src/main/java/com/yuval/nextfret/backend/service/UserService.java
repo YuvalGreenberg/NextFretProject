@@ -4,6 +4,8 @@ import com.yuval.nextfret.backend.db.Db;
 import com.yuval.nextfret.backend.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.yuval.nextfret.backend.entity.Genre;
 import com.yuval.nextfret.backend.entity.Song;
 
 import java.util.List;
@@ -48,6 +50,22 @@ public class UserService {
 
     public Song getFullSongByUserId(Long userId, Long songId) {
         return db.getFullSongDetailsForUser(userId, songId);
+    }
+
+    public List<Genre> getFavoriteGenresForUser(Long userId) {
+        return db.getFavoriteGenresForUser(userId);
+    }
+
+    public List<Genre> getAllGenres() {
+        return db.getAllGenres();
+    }
+
+    public void addGenreToUser(Long userId, Long genreId) {
+        db.addUserGenre(userId, genreId);
+    }
+
+    public void removeGenreFromUser(Long userId, Long genreId) {
+        db.deleteUserGenre(userId, genreId);
     }
 
     

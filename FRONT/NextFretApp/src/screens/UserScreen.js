@@ -14,9 +14,11 @@ import { Ionicons } from '@expo/vector-icons';
 import AuthContext from '../contexts/AuthContext';
 import API_URL from '../config';
 
+
 export default function UserScreen({ navigation }) {
-    const { userId, logout } = useContext(AuthContext);
+    const { userId, signOut } = useContext(AuthContext);
     const [chords, setChords] = useState([]);
+    const [genres, setGenres] = useState([]);
     const [loading, setLoading] = useState(true);
     const [userInfo, setUserInfo] = useState(null);
 
@@ -31,6 +33,14 @@ export default function UserScreen({ navigation }) {
             .catch(console.error)
             .finally(() => { if (isActive) setLoading(false); });
 
+        // Fetch user favorite genres
+        fetch(`${API_URL}/api/userManager/${userId}/genres`)
+            .then(res => res.json())
+            .then(data => {
+                if (isActive && Array.isArray(data)) setGenres(data);
+            })
+            .catch(console.error);
+
         // Fetch user details
         fetch(`${API_URL}/api/userManager/${userId}/profile`)
             .then(res => res.json())
@@ -38,6 +48,8 @@ export default function UserScreen({ navigation }) {
                 if (isActive) setUserInfo(data);
             })
             .catch(console.error);
+
+
 
         return () => { isActive = false; };
     }, [userId]);
@@ -83,6 +95,27 @@ export default function UserScreen({ navigation }) {
                 ))}
             </View>
 
+            <View style={styles.headerRow}>
+                <Text style={styles.sectionTitle}>My Genres</Text>
+                <TouchableOpacity
+                    style={styles.arrowButton}
+                    onPress={() => navigation.navigate('MyGenres')}
+                >
+                    <Ionicons name="add" size={20} color="#386641" />
+                </TouchableOpacity>
+            </View>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.genresContainer}
+            >
+                {genres.map(item => (
+                    <View key={item.id} style={styles.genreItem}>
+                        <Text style={styles.chordText}>{item.title}</Text>
+                    </View>
+                ))}
+            </ScrollView>
+
             <View style={styles.infoContainer}>
                 {[
                     { label: 'Email', value: userInfo.email },
@@ -107,12 +140,17 @@ export default function UserScreen({ navigation }) {
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <Button
+                    {/* <Button
                         title="Logout"
                         onPress={() => {
-                            logout();
+                            signOut();
                             navigation.replace('Login');
                         }}
+                        color="red"
+                    /> */}
+                    <Button
+                        title="Logout"
+                        onPress={signOut} // מספיק
                         color="red"
                     />
                 </View>
@@ -124,9 +162,12 @@ export default function UserScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 16,
-        paddingTop: 0,
+        paddingTop: 20,
         paddingBottom: 16,
         backgroundColor: '#fff',
+        flexGrow: 1,
+
+
     },
     loaderContainer: {
         flex: 1,
@@ -148,6 +189,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         margin: 4,                // רווח סביב כל עיגול
+    },
+    genreItem: {
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        backgroundColor: '#f7f7f7',
+        borderRadius: 20,
+        margin: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'flex-start', //
     },
     chordText: {
         fontSize: 15,
@@ -187,6 +238,12 @@ const styles = StyleSheet.create({
     chordsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',         // מאפשר עטיפה לשורה הבאה אם לא נכנס
+        justifyContent: 'flex-start',
+        marginBottom: 10,
+    },
+    genresContainer: {
+        flexDirection: 'row',
+
         justifyContent: 'flex-start',
         marginBottom: 10,
     },

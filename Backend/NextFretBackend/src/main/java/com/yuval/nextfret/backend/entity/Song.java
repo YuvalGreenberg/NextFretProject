@@ -1,7 +1,6 @@
 package com.yuval.nextfret.backend.entity;
 
 import javax.persistence.*;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.sql.Date;
 import java.util.List;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "songs")
 public class Song {
@@ -37,6 +36,17 @@ public class Song {
     @Transient
     @JsonProperty("isLiked")
     private boolean isLiked;
+
+    @JsonProperty("coverUrl")
+    private String coverUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id")
+    @JsonProperty("genre")
+    private Genre genre;
+
+    @JsonProperty("previewUrl")
+    private String previewUrl;
 
     public Song() {
     }
@@ -116,5 +126,29 @@ public class Song {
 
     public void setIsLiked(boolean liked) {
         this.isLiked = liked;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
+    }
+
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+    
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
     }
 }

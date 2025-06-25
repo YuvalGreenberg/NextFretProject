@@ -1,5 +1,7 @@
+com/yuval/nextfret/backend/util/ItunesMetadataUpdater.class
 com/yuval/nextfret/backend/service/UserService.class
 com/yuval/nextfret/backend/db/Db.class
+com/yuval/nextfret/backend/entity/Genre.class
 com/yuval/nextfret/backend/controller/UserManagerController.class
 com/yuval/nextfret/backend/config/WebConfig.class
 com/yuval/nextfret/backend/BackendApplication.class

@@ -6,10 +6,14 @@ import com.yuval.nextfret.backend.service.UserService;
 import com.yuval.nextfret.backend.service.ItunesCoverService;
 import com.yuval.nextfret.backend.db.Db;
 import com.yuval.nextfret.backend.entity.Chord;
+import com.yuval.nextfret.backend.entity.Genre;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +27,13 @@ public class UserManagerController {
 
     private final UserService userService;
     private final Db db;
-    //private final ItunesCoverService itunesService;
-
+    // private final ItunesCoverService itunesService;
 
     @Autowired
     public UserManagerController(UserService userService, Db db) {
         this.userService = userService;
         this.db = db;
-        
+
     }
 
     @GetMapping("/all")
@@ -120,7 +123,7 @@ public class UserManagerController {
         User user = userService.getUserById(userId);
         if (user == null) {
             return ResponseEntity.notFound().build();
-        }        
+        }
         user.setPassword(null);
         return ResponseEntity.ok(user);
     }
@@ -193,6 +196,38 @@ public class UserManagerController {
         return ResponseEntity.ok().build();
     }
 
-    
+    @GetMapping("/{userId}/genres")
+    public ResponseEntity<?> getUserGenres(@PathVariable long userId) {
+        try {
+            List<Genre> userGenres = userService.getFavoriteGenresForUser(userId);
+
+            if (userGenres == null)
+                return ResponseEntity.ok(Collections.emptyList());
+
+            return ResponseEntity.ok(userGenres);
+        } catch (Exception e) {
+            e.printStackTrace(); // חשוב! כדי לראות מה שבר את זה
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to fetch user genres"));
+        }
+    }
+
+    @GetMapping("/genres/all")
+    public ResponseEntity<List<Genre>> getAllGenres() {
+        return ResponseEntity.ok(userService.getAllGenres());
+    }
+
+    @PostMapping("/{userId}/genres")
+    public ResponseEntity<Void> addGenreToUser(@PathVariable Long userId, @RequestBody Map<String, Long> body) {
+        Long genreId = body.get("genreId");
+        userService.addGenreToUser(userId, genreId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{userId}/genres/{genreId}")
+    public ResponseEntity<Void> removeGenreFromUser(@PathVariable Long userId, @PathVariable Long genreId) {
+        userService.removeGenreFromUser(userId, genreId);
+        return ResponseEntity.noContent().build();
+    }
 
 }

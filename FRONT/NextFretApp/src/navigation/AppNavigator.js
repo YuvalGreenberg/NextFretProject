@@ -8,10 +8,11 @@ import RegisterScreen from '../screens/RegisterScreen';
 import MainScreen from '../screens/MainScreen';
 import MyLibraryScreen from '../screens/MyLibraryScreen';
 import MyChordsScreen from '../screens/MyChordsScreen';
-import RecommendationsScreen from '../screens/RecommendationsScreen';
+import RecommendationsScreen from '../screens/RecommendationsScreen copy';
 import UserScreen from '../screens/UserScreen';
 import SearchScreen from '../screens/SearchScreen';
 import SongDetailScreen from '../screens/SongDetailScreen';
+import MyGenresScreen from '../screens/MyGenreScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import FooterMenu from '../components/FooterMenu';
@@ -20,9 +21,9 @@ import { View, StyleSheet } from 'react-native';
 function MainLayout({ children }) {
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      {/* <SafeAreaView style={styles.safeArea}> */}
         <View style={styles.content}>{children}</View>
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
       <FooterMenu />
     </View>
   );
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   content: {
     flex: 1,
-    paddingBottom: 60, // adjust if your footer height is different
+    paddingBottom: 80, // adjust if your footer height is different
   },
 });
 
@@ -116,11 +117,31 @@ function AppStack() {
       </Stack.Screen>
       <Stack.Screen
         name="MyChords"
-        options={{ title: 'My Chords' , headerShown: false}}
+        options={{
+          title: 'My Chords',
+          animation: 'slide_from_bottom',
+          //presentation: 'transparentModal',
+          animationDuration: 400,
+        }}
       >
         {props => (
           <MainLayout>
             <MyChordsScreen {...props} />
+          </MainLayout>
+        )}
+      </Stack.Screen>
+      <Stack.Screen
+        name="MyGenres"
+        options={{
+          title: 'My Genres',
+          animation: 'slide_from_bottom',
+          //presentation: 'transparentModal',
+          animationDuration: 400,
+        }}
+      >
+        {props => (
+          <MainLayout>
+            <MyGenresScreen {...props} />
           </MainLayout>
         )}
       </Stack.Screen>

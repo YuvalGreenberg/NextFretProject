@@ -23,9 +23,18 @@ public class RecommendationEngineController {
         this.recommendationService = recommendationService;
     }
 
+    // @GetMapping("/user/{userId}")
+    // public ResponseEntity<List<Song>> getRecommendations(@PathVariable Long
+    // userId) {
+    // List<Song> recs = recommendationService.recommendSongsForUser(userId);
+    // return ResponseEntity.ok(recs);
+    // }
+
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Song>> getRecommendations(@PathVariable Long userId) {
-        List<Song> recs = recommendationService.recommendSongsForUser(userId);
+    public ResponseEntity<List<Song>> getRecommendations(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Integer maxUnknown) {
+        List<Song> recs = recommendationService.recommendSongsForUser(userId, maxUnknown);
         return ResponseEntity.ok(recs);
     }
 

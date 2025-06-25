@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         padding: 16,
+        //marginTop: -40,
     },
     searchInput: {
         height: 40,
@@ -131,8 +132,13 @@ const styles = StyleSheet.create({
         color: '#777',
     },
     emptyText: {
-        marginTop: 20,
+        flex: 1,
         textAlign: 'center',
+        textAlignVertical: 'center', // לא בכל המכשירים תופס
+        fontSize: 20,
+        fontWeight: '500',
         color: '#888',
-    },
+        paddingHorizontal: 16,
+        paddingTop: 100, // כדי למרכז ויזואלית בגובה
+      },
 });

@@ -40,31 +40,9 @@ export default function MyLibraryScreen({ navigation }) {
     return () => { isActive = false; };
   }, [userId]);
 
-  // Fetch artwork URLs for songs missing coverUrl
-  useEffect(() => {
-    songs.forEach((song, idx) => {
-      if (!song.coverUrl) {
-        fetch(`${API_URL}/api/userManager/${userId}/cover/${song.id}`)
-          .then(res => {
-            if (res.ok) return res.text();
-            throw new Error('No cover');
-          })
-          .then(url => {
-            setSongs(prev => {
-              const updated = [...prev];
-              updated[idx] = { ...updated[idx], coverUrl: url };
-              return updated;
-            });
-          })
-          .catch(() => {
-            // leave placeholder
-          });
-      }
-    });
-  }, [songs]);
-
   const filtered = songs.filter(song =>
-    song.title.toLowerCase().includes(query.trim().toLowerCase())
+    song.title.toLowerCase().includes(query.trim().toLowerCase()) ||
+    (song.artist || '').toLowerCase().includes(query.trim().toLowerCase())
   );
 
   const renderItem = ({ item }) => (
@@ -123,7 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 20,
     backgroundColor: '#fff',
   },
   safeArea: { flex: 1, backgroundColor: '#fff' },
@@ -138,7 +116,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     paddingHorizontal: 8,
     borderRadius: 4,
-    marginTop: -40,
+   // marginTop: -40,
     marginBottom: 8,
   },
   list: {

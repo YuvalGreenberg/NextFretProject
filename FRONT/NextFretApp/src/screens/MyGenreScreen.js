@@ -1,5 +1,3 @@
-// NextFretApp/src/screens/MyChordsScreen.js
-
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
   View,
@@ -14,42 +12,46 @@ import {
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
 
-export default function MyChordsScreen({ navigation, route }) {
+export default function MyGenresScreen({ navigation }) {
   const { userId } = useContext(AuthContext);
 
-  const [chords, setChords] = useState([]);           // רשימת כל האקורדים (עם שדה known)
+  const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');   // מחרוזת החיפוש
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // בעת טעינת המסך, משוך את כל האקורדים ושל האקורדים שהמשתמש יודע
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
 
     Promise.all([
-      fetch(`${API_URL}/api/userManager/chords/all`).then(res => res.json()),
-      fetch(`${API_URL}/api/userManager/${userId}/chords`).then(res => res.json()),
+      fetch(`${API_URL}/api/userManager/genres/all`).then(res => res.json()),
+      fetch(`${API_URL}/api/userManager/${userId}/genres`).then(res => res.json()),
     ])
-      .then(([allChords, userChords]) => {
+      .then(([allGenres, userGenres]) => {
         if (!isMounted) return;
 
-        const userSet = new Set(userChords.map(c => c.id));
-        const merged = allChords.map(c => ({
-          id: c.id,
-          name: c.name,
-          known: userSet.has(c.id),
+        if (!Array.isArray(userGenres)) {
+          console.warn("⚠️ userGenres response is not an array, continuing with empty list:", userGenres);
+          userGenres = [];
+        }
+
+        const userSet = new Set(userGenres.map(g => g.id));
+        const merged = allGenres.map(g => ({
+          id: g.id,
+          title: g.title,
+          liked: userSet.has(g.id),
         }));
 
         merged.sort((a, b) => {
-          if (a.known === b.known) return a.name.localeCompare(b.name);
-          return a.known ? -1 : 1;
+          if (a.liked === b.liked) return a.title.localeCompare(b.title);
+          return a.liked ? -1 : 1;
         });
 
-        setChords(merged);
+        setGenres(merged);
       })
       .catch(err => {
-        console.error('🔴 Error fetching chords:', err);
-        Alert.alert('Error', 'Failed to load chords');
+        console.error('🔴 Error fetching genres:', err);
+        Alert.alert('Error', 'Failed to load genres');
       })
       .finally(() => {
         if (isMounted) setLoading(false);
@@ -58,28 +60,25 @@ export default function MyChordsScreen({ navigation, route }) {
     return () => { isMounted = false; };
   }, [userId]);
 
-  // כאשר לוחצים על אקורד – הוסף או הסר אותו מהמשתמש
-  const handleToggleChord = useCallback(async (item) => {
-    const isKnown = item.known;
-  
-    // עדכון מיידי ל־UI – רק שינוי הצבע
-    setChords(prev =>
-      prev.map(c =>
-        c.id === item.id ? { ...c, known: !isKnown } : c
+  const handleToggleGenre = useCallback(async (item) => {
+    const isLiked = item.liked;
+
+    setGenres(prev =>
+      prev.map(g =>
+        g.id === item.id ? { ...g, liked: !isLiked } : g
       )
     );
-  
-    // סנכרון עם השרת (אופציונלי)
+
     try {
-      const url = `${API_URL}/api/userManager/${userId}/chords${isKnown ? `/${item.id}` : ''}`;
-      const options = isKnown
+      const url = `${API_URL}/api/userManager/${userId}/genres${isLiked ? `/${item.id}` : ''}`;
+      const options = isLiked
         ? { method: 'DELETE' }
         : {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chordId: item.id }),
+            body: JSON.stringify({ genreId: item.id }),
           };
-  
+
       const res = await fetch(url, options);
       if (!res.ok) {
         throw new Error('Sync failed');
@@ -90,21 +89,20 @@ export default function MyChordsScreen({ navigation, route }) {
     }
   }, [userId]);
 
-  // פילטר על פי מחרוזת החיפוש (case-insensitive)
-  const filteredChords = chords.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredGenres = genres.filter(g =>
+    g.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
-        styles.chordGridItem,
-        { backgroundColor: item.known ? '#A7C957' : '#F2E8CF' },
+        styles.genreGridItem,
+        { backgroundColor: item.liked ? '#A7C957' : '#F2E8CF' },
       ]}
-      onPress={() => handleToggleChord(item)}
+      onPress={() => handleToggleGenre(item)}
       activeOpacity={0.7}
     >
-      <Text style={styles.chordGridText}>{item.name}</Text>
+      <Text style={styles.genreGridText}>{item.title}</Text>
     </TouchableOpacity>
   );
 
@@ -112,10 +110,9 @@ export default function MyChordsScreen({ navigation, route }) {
     <View style={styles.container}>
       
 
-      {/* שורת חיפוש */}
       <TextInput
         style={styles.searchInput}
-        placeholder="Search chords..."
+        placeholder="Search genres..."
         value={searchTerm}
         onChangeText={setSearchTerm}
         autoCapitalize="none"
@@ -127,15 +124,15 @@ export default function MyChordsScreen({ navigation, route }) {
         <ActivityIndicator size="small" />
       ) : (
         <FlatList
-          data={filteredChords}
+          data={filteredGenres}
           keyExtractor={item => String(item.id)}
           renderItem={renderItem}
           numColumns={3}
           contentContainerStyle={
-            filteredChords.length === 0 && { flex: 1, justifyContent: 'center' }
+            filteredGenres.length === 0 && { flex: 1, justifyContent: 'center' }
           }
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No chords match your search.</Text>
+            <Text style={styles.emptyText}>No genres match your search.</Text>
           }
         />
       )}
@@ -144,7 +141,7 @@ export default function MyChordsScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 20, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   title: { fontSize: 24, marginBottom: 8, textAlign: 'center' },
   searchInput: {
     borderWidth: 1,
@@ -154,7 +151,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginBottom: 12,
   },
-  chordGridItem: {
+  genreGridItem: {
     flex: 1,
     aspectRatio: 1,
     margin: 6,
@@ -163,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minWidth: 0,
   },
-  chordGridText: {
+  genreGridText: {
     fontSize: 16,
     color: '#222',
     fontWeight: 'bold',
