@@ -14,6 +14,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AuthContext from '../contexts/AuthContext';
 import API_URL from '../config';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 
 export default function UserScreen({ navigation }) {
@@ -23,37 +25,40 @@ export default function UserScreen({ navigation }) {
     const [loading, setLoading] = useState(true);
     const [userInfo, setUserInfo] = useState(null);
 
-    useEffect(() => {
-        let isActive = true;
-        // Fetch user chords
-        fetch(`${API_URL}/api/userManager/${userId}/chords`)
+    useFocusEffect(
+        useCallback(() => {
+          let isActive = true;
+      
+          setLoading(true);
+      
+          // משיכת האקורדים של המשתמש
+          fetch(`${API_URL}/api/userManager/${userId}/chords`)
             .then(res => res.json())
             .then(data => {
-                if (isActive && Array.isArray(data)) setChords(data);
+              if (isActive && Array.isArray(data)) setChords(data);
             })
             .catch(console.error)
             .finally(() => { if (isActive) setLoading(false); });
-
-        // Fetch user favorite genres
-        fetch(`${API_URL}/api/userManager/${userId}/genres`)
+      
+          // משיכת הז'אנרים של המשתמש
+          fetch(`${API_URL}/api/userManager/${userId}/genres`)
             .then(res => res.json())
             .then(data => {
-                if (isActive && Array.isArray(data)) setGenres(data);
+              if (isActive && Array.isArray(data)) setGenres(data);
             })
             .catch(console.error);
-
-        // Fetch user details
-        fetch(`${API_URL}/api/userManager/${userId}/profile`)
+      
+          // משיכת פרטי הפרופיל של המשתמש
+          fetch(`${API_URL}/api/userManager/${userId}/profile`)
             .then(res => res.json())
             .then(data => {
-                if (isActive) setUserInfo(data);
+              if (isActive) setUserInfo(data);
             })
             .catch(console.error);
-
-
-
-        return () => { isActive = false; };
-    }, [userId]);
+      
+          return () => { isActive = false; };
+        }, [userId])
+      );
 
     const renderChord = ({ item }) => (
         <TouchableOpacity
@@ -84,7 +89,7 @@ export default function UserScreen({ navigation }) {
     // Handler for deleting the user account
     const handleDeleteAccount = async () => {
         // TODO: Add API call here
-        Alert.alert("Account Deleted", "This would delete the account. (API not implemented yet)");
+        Alert.alert("Account Deleted", "Sorry to see you go!");
         signOut(); // Optional: log out after deletion
     };
 

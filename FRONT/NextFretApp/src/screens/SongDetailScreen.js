@@ -157,9 +157,10 @@ export default function SongDetailScreen({ route, navigation }) {
           )}
         </View>
 
-        
+
         <View style={styles.lyricsContainer}>
           {song.lyrics
+            ?.replace(/\n{3,}/g, '\n\n')
             ?.split('\n')
             .filter(line => !line.trim().startsWith('#'))
             .map((line, index) => {
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
   chordList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 16,
+    marginBottom: -50,
     //alignSelf: 'flex-end',
   },
   chordButton: {
@@ -272,12 +273,12 @@ const styles = StyleSheet.create({
     color: '#f7f7f7',
   },
   lyricsContainer: {
-    marginTop: 8,
+    marginTop: 20,
   },
   lyricsLine: {
     fontSize: 16,
-    lineHeight: 22,
     flexWrap: 'wrap',
+    marginBottom: 1,
   },
   chordText: {
     fontWeight: 'bold',
@@ -308,13 +309,13 @@ const styles = StyleSheet.create({
     height: 80,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
-    backgroundColor: '#fff',    
+    backgroundColor: '#fff',
     zIndex: 10,
   },
   button: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',     
+    justifyContent: 'center',
     marginBottom: 20,// פה תיזמו את הפדינג
   },
 });

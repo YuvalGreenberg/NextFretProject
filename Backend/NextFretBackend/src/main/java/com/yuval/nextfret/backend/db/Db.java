@@ -157,7 +157,7 @@ public class Db {
     }
 
     public User login(String email, String password) {
-        String sql = "SELECT id, first_name, last_name, email, password FROM users WHERE email = ? AND password = ?";
+        String sql = "SELECT id, first_name, last_name, email, password FROM users WHERE LOWER(email) = LOWER(?) AND password = ?";
 
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

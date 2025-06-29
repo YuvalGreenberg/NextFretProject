@@ -13,6 +13,8 @@ import {
 import API_URL from '../config';
 import AuthContext from '../contexts/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 export default function MyLibraryScreen({ navigation }) {
   const { userId } = useContext(AuthContext);
@@ -20,25 +22,27 @@ export default function MyLibraryScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    let isActive = true;
-    setLoading(true);
-
-    fetch(`${API_URL}/api/userManager/${userId}/library`)
-      .then(res => res.json())
-      .then(data => {
-        if (isActive && Array.isArray(data)) {
-          const sorted = [...data].sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
-          setSongs(sorted);
-        }
-      })
-      .catch(console.error)
-      .finally(() => {
-        if (isActive) setLoading(false);
-      });
-
-    return () => { isActive = false; };
-  }, [userId]);
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      setLoading(true);
+  
+      fetch(`${API_URL}/api/userManager/${userId}/library`)
+        .then(res => res.json())
+        .then(data => {
+          if (isActive && Array.isArray(data)) {
+            const sorted = [...data].sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
+            setSongs(sorted);
+          }
+        })
+        .catch(console.error)
+        .finally(() => {
+          if (isActive) setLoading(false);
+        });
+  
+      return () => { isActive = false; };
+    }, [userId])
+  );
 
   const filtered = songs.filter(song =>
     song.title.toLowerCase().includes(query.trim().toLowerCase()) ||
